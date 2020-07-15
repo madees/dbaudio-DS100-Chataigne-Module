@@ -16,20 +16,19 @@ You'll find the module in the Module Manager>Hardware>Community Mpdules.
 
 ## Module interface
 First, Module parameters :
-- Default Coordinate Mapping : used in all commands that need to specify a coordiante mapping.
-If you keep the mapping parameter at 0, it will use this default value.
+- Default Coordinate Mapping : used in all commands that need to specify a coordinate mapping.
+If you keep the command mapping parameter at 0, it will use this default value instead.
 
 - EnSpace Reverb Room :
-A selector to directly change the EnSpace Room.
-Reminder with roomIndex numbers if you use the command instead.
+A selector to directly change or turn off the EnSpace room simulator from Chataigne GUI.
 
 - OSC Output port :
-Default IP address setting is 192.168.1.100. You can change it if necessary here.
+Default IP address setting is 192.168.1.100. You can change it there if necessary.
 
 - Values>DS100 Device status
 The only action there is a trigger, that will collect the Device infos.
 All others values are read only.
-"Is there anybody out there" is blue when the Device answers to Ping.
+"Is there anybody out there" indicator is turning blue when the Device answers to Ping.
 
 ## Commands
 From now, in V1, only commands have been implemented and tested.
@@ -49,7 +48,7 @@ Here is the command list, if you need to know more about parameters type and ran
 - sceneRecall(majIndex, minIndex) : recal a specific scene. Scene index is split in two integers: majIndex.minIndex, max is 999.99
 
 ### Sound objects manipulation
-- function sourceSpread(object, spread) : set the spread parameter of a specific sound object
+- sourceSpread(object, spread) : set the spread parameter of a specific sound object
 
 - sourceDelayMode(object, mode) : set the delay mode of a specific sound object
 
