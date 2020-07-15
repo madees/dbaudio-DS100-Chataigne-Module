@@ -5,8 +5,8 @@
 	
 	"version": "1.0.0",
 	"description": "Module to control sound objects with the d&b DS100 OSC command API. Visit https://www.dbsoundscape.com/ to learn more about d&b Soundscape and DS100, especially download the TI501 'd&b Soundscape System design and operation' and DS100 OSC protocol white paper.",
-	"url": "https://github.com/dbaudio-soundscape/",
-	"downloadURL": "https://github.com/dbaudio-soundscape/",
+	"url": "https://github.com/madees/dbaudio-DS100-Chataigne-Module",
+	"downloadURL": "https://github.com/madees/dbaudio-DS100-Chataigne-Module/archive/master.zip",
 	
 	"hasInput": true,
 	"hasOutput": true, 
