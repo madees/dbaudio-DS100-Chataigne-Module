@@ -1,0 +1,351 @@
+{
+	"name": "d&b DS100 OSC Control",
+	"type": "OSC",
+	"path": "Hardware",
+	
+	"version": "1.0.0",
+	"description": "Module to control sound objects with the d&b DS100 OSC command API. Visit https://www.dbsoundscape.com/ to learn more about d&b Soundscape and DS100, especially download the TI501 'd&b Soundscape System design and operation' and DS100 OSC protocol white paper.",
+	"url": "https://github.com/dbaudio-soundscape/",
+	"downloadURL": "https://github.com/dbaudio-soundscape/",
+	
+	"hasInput": true,
+	"hasOutput": true, 
+	"hideDefaultCommands": false,
+	"hideDefaultParameters": [
+		"autoRange",
+		"autoFeedback",
+		"pass_through",
+		"input",
+		"outputs"
+	],
+	
+	"defaults": {
+		"autoAdd": false,
+		"oscInput": {
+			"localPort": 50011
+		},
+		"OSC Outputs": {
+			"OSC Output": {
+				"local": false,
+				"remoteHost": "192.168.1.100",
+				"remotePort": 50010
+			}
+		}
+	},
+	
+	"parameters": {
+		"Default Coordinate Mapping": {
+			"type": "Integer",
+			"default": 1,
+			"min": 1,
+			"max": 4
+		},
+		"EnSpace Reverb Room" : {
+			"type": "Enum",
+			"options":
+					{
+						"0: Off":0,
+						"1: Modern Small":1,
+						"2: Classic Small":2,
+						"3: Modern Medium":3,
+						"4: Classic Medium":4,
+						"5: Modern Large":5,
+						"6: Classic Large":6,
+						"7: Modern Medium 2":7,
+						"8: Theater Small":8,
+						"9: Cathedral":9
+					}
+		}
+	},
+	
+	"scripts": [
+		"DS100-osc.js"
+	],
+	
+	"values": {
+		"DS100 Device status":
+		{
+			"type":"Container",
+
+			"Click to update all":
+			{
+				"type":"Trigger"
+			},
+			"Device Name":
+			{
+				"type":"String"
+			},
+			"Serial Number":
+			{
+				"type":"String"
+			},
+			"Is there anybody out there":
+			{
+				"type":"Boolean"
+			},
+			"Error":
+			{
+				"type":"Boolean"
+			},
+			"Error text":
+			{
+				"type":"String"
+			}
+		}
+	},
+	
+	"commands": 
+	{
+		"deviceClear":
+		{
+			"menu":"",
+			"callback":"deviceClear",
+			"parameters":
+			{
+			}
+		},
+
+		"masterOutputLevel":
+		{
+			"menu":"",
+			"callback":"masterOutputLevel",
+			"parameters":
+			{
+				"Level":
+				{
+					"type":"Float",
+					"min":-120,
+					"max":24
+				}
+			}
+		},
+
+		"reverbRoomId":
+		{
+			"menu":"",
+			"callback":"reverbRoomId",
+			"parameters":
+			{
+				"RoomId":
+				{
+					"type":"Integer",
+					"min":0,
+					"max":9
+				}
+			}
+		},
+		
+		"nextScene":
+		{
+			"menu":"",
+			"callback":"nextScene",
+			"parameters":
+			{
+			}
+		},
+			
+		"previousScene":
+		{
+			"menu":"",
+			"callback":"previousScene",
+			"parameters":
+			{
+			}
+		},
+		
+		"sceneRecall":
+		{
+			"menu":"",
+			"callback":"sceneRecall",
+			"parameters":
+			{
+				"Major index":
+				{
+					"type":"Integer",
+					"min":0,
+					"max":999
+				},
+				"Minor index":
+				{	"type":"Integer",
+					"min":0,
+					"max":99
+				}
+			}
+		},
+		
+		"sourceSpread":
+		{
+			"menu":"",
+			"callback":"sourceSpread",
+			"parameters":
+			{
+				"Object":
+				{
+					"type":"Integer",
+					"min":1,
+					"max":64
+				},
+				"Spread":
+				{
+					"type":"Float",
+					"min":0,
+					"max":1
+				}
+			}
+		},
+
+		"sourceDelayMode":
+		{
+			"menu":"",
+			"callback":"sourceDelayMode",
+			"parameters":
+			{
+				"Object":
+				{
+					"type":"Integer",
+					"min":1,
+					"max":64
+				},
+				"Delay Mode":
+				{
+					"type":"Enum",
+					"options":
+					{
+						"Off":0,
+						"Tight":1,
+						"Full":2
+					}
+				}
+			}
+		},
+
+		"coordinateMappingSourcePositionXY":
+		{
+			"menu":"",
+			"callback":"coordinateMappingSourcePositionXY",
+			"parameters":
+			{
+				"Mapping":
+				{
+					"type":"Integer",
+					"min":0,
+					"max":4
+				},
+				"Object":
+				{
+					"type":"Integer",
+					"min":1,
+					"max":64
+				},
+				"Position":
+				{
+					"type":"Point2D",
+					"min":[0,0],
+					"max":[1,1]
+				}	
+			}
+		},
+
+		"coordinateMappingSourcePosition2DCartesian":
+		{
+			"menu":"",
+			"callback":"coordinateMappingSourcePosition2DCartesian",
+			"parameters":
+			{
+				"Mapping":
+				{
+					"type":"Integer",
+					"min":0,
+					"max":4
+				},
+				"Object":
+				{
+					"type":"Integer",
+					"min":1,
+					"max":64
+				},
+				"Position":
+				{
+					"type":"Point2D",
+					"min":[-1,-1],
+					"max":[1,1]
+				}	
+			}
+		},
+
+		"coordinateMappingSourcePosition2DPolar":
+		{
+			"menu":"",
+			"callback":"coordinateMappingSourcePosition2DPolar",
+			"parameters":
+			{
+				"Mapping":
+				{
+					"type":"Integer",
+					"min":0,
+					"max":4
+				},
+				"Object":
+				{
+					"type":"Integer",
+					"min":1,
+					"max":64
+				},
+				"Azimuth":
+				{
+					"type":"Float",
+					"min":0,
+					"max":1
+				},
+				"Distance":
+				{
+					"type":"Float",
+					"min":0,
+					"max":1
+				}
+			}
+		},
+		
+		"reverbSendGain":
+		{
+			"menu":"",
+			"callback":"reverbSendGain",
+			"parameters":
+			{
+				"Object":
+				{
+					"type":"Integer",
+					"min":1,
+					"max":64
+				},
+				"Send gain dB":
+				{
+					"type":"Float",
+					"min":-120,
+					"max":24
+				}
+			}
+		},
+
+		"reverbSendGain":
+		{
+			"menu":"",
+			"callback":"reverbSendGain",
+			"parameters":
+			{
+				"Object":
+				{
+					"type":"Integer",
+					"min":1,
+					"max":64
+				},
+				"Send gain dB":
+				{
+					"type":"Float",
+					"min":-120,
+					"max":24
+				}
+			}
+		}
+	}
+}
