@@ -3,7 +3,7 @@
 	"type": "OSC",
 	"path": "Hardware",
 	
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Module to control sound objects with the d&b DS100 OSC command API. Visit https://www.dbsoundscape.com/ to learn more about d&b Soundscape and DS100, especially download the TI501 'd&b Soundscape System design and operation' and DS100 OSC protocol white paper.",
 	"url": "https://github.com/madees/dbaudio-DS100-Chataigne-Module",
 	"downloadURL": "https://github.com/madees/dbaudio-DS100-Chataigne-Module/archive/master.zip",
@@ -137,7 +137,7 @@
 		
 		"nextScene":
 		{
-			"menu":"",
+			"menu":"Scenes",
 			"callback":"nextScene",
 			"parameters":
 			{
@@ -146,7 +146,7 @@
 			
 		"previousScene":
 		{
-			"menu":"",
+			"menu":"Scenes",
 			"callback":"previousScene",
 			"parameters":
 			{
@@ -155,7 +155,7 @@
 		
 		"sceneRecall":
 		{
-			"menu":"",
+			"menu":"Scenes",
 			"callback":"sceneRecall",
 			"parameters":
 			{
@@ -175,7 +175,7 @@
 		
 		"sourceSpread":
 		{
-			"menu":"",
+			"menu":"Sound Objects",
 			"callback":"sourceSpread",
 			"parameters":
 			{
@@ -196,7 +196,7 @@
 
 		"sourceDelayMode":
 		{
-			"menu":"",
+			"menu":"Sound Objects",
 			"callback":"sourceDelayMode",
 			"parameters":
 			{
@@ -221,7 +221,7 @@
 
 		"coordinateMappingSourcePositionXY":
 		{
-			"menu":"",
+			"menu":"Sound Objects",
 			"callback":"coordinateMappingSourcePositionXY",
 			"parameters":
 			{
@@ -248,7 +248,7 @@
 
 		"coordinateMappingSourcePosition2DCartesian":
 		{
-			"menu":"",
+			"menu":"Sound Objects",
 			"callback":"coordinateMappingSourcePosition2DCartesian",
 			"parameters":
 			{
@@ -275,7 +275,7 @@
 
 		"coordinateMappingSourcePosition2DPolar":
 		{
-			"menu":"",
+			"menu":"Sound Objects",
 			"callback":"coordinateMappingSourcePosition2DPolar",
 			"parameters":
 			{
@@ -308,7 +308,7 @@
 		
 		"reverbSendGain":
 		{
-			"menu":"",
+			"menu":"Sound Objects",
 			"callback":"reverbSendGain",
 			"parameters":
 			{
@@ -327,10 +327,10 @@
 			}
 		},
 
-		"reverbSendGain":
+		"matrixInputGain":
 		{
-			"menu":"",
-			"callback":"reverbSendGain",
+			"menu":"Sound Objects",
+			"callback":"matrixInputGain",
 			"parameters":
 			{
 				"Object":
@@ -339,7 +339,7 @@
 					"min":1,
 					"max":64
 				},
-				"Send gain dB":
+				"Gain dB":
 				{
 					"type":"Float",
 					"min":-120,
