@@ -12,7 +12,7 @@ https://discord.com/invite/ngnJ5z my contact there is "madees".
 
 ## Installation
 To install the Custom Module, just copy the folder in My Documents\Chataigne\modules.
-You'll find the module in the Module Manager>Hardware>Community Mpdules.
+You'll find the module in the Module Manager>Hardware>Community Modules.
 
 ## Module interface
 First, Module parameters :
