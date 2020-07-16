@@ -44,7 +44,7 @@ Here is the command list, if you need to know more about arguments type and rang
 If you need one OSC command that isn't in the module yet, (for example, matrix control), the command Custom Message is there in the module for that purpose. Just add the OSC string from documentation above and eventually Arguments. If you think this command may be usefull for other users and want to add it to the Module, just contact me.
 
 ### Global device
-- deviceClear() : clear all DS100 settings
+- deviceClear() : clear all DS100 values settings !!! Use with care
 
 - reverbRoomId(id) : set the reverb room id (0=off, 1-9=room model)
 
