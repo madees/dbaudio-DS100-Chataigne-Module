@@ -2,6 +2,7 @@
 Chataigne module to control d&amp;b audiotechnik DS100 matrix hardware with OSC protocol.  
 
 To learn more about Chataigne, please visit : http://benjamin.kuperberg.fr/chataigne/
+
 And Ben's Youtube channel where you can find tutorials : https://youtu.be/RSBU9MwJNLY
 
 To learn more about d&amp;b audiotechnik DS100, please visit : https://www.dbsoundscape.com/  
