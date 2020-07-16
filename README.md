@@ -31,8 +31,17 @@ All others values are read only.
 "Is there anybody out there" indicator is turning blue when the Device answers to Ping.
 
 ## Commands
-From now, in V1, only commands have been implemented and tested.
-Here is the command list, if you need to know more about parameters type and ranges, please refer to the https://www.dbaudio.com/assets/products/downloads/manuals-documentation/electronics/dbaudio-osc-protocol-ds100-1.3.0-en.pdf :
+From now, in V1, only commands have been implemented and tested. Next step will be to have Sound Object container(s) for direct access to bi directionnal Values manipulation.
+
+Commands are ready to use in your scripts, or with the "Command tester" tool, or as outputs from the Sequences in Time Machine. As an example, you can create a Sequence, add a Mapping 2D and use as outputs the command coordinateMappingPosition2DCartesian to generate sound objects displacements cues.
+
+#### Common arguments
+- gain is in dB, float, -120 to +24 range
+- object is sound object (input matrix channel), integer, 1 to 64 range
+- mapping is the DS100 coordinate mapping system id, integer, 0 will use the global module parameter, 1 to 4 range
+
+Here is the command list, if you need to know more about arguments type and ranges, please refer to the https://www.dbaudio.com/assets/products/downloads/manuals-documentation/electronics/dbaudio-osc-protocol-ds100-1.3.0-en.pdf
+If you need one OSC command that isn't in the module yet, (for example, matrix control), the command Custom Message is there in the module for that purpose. Just add the OSC string from documentation above and eventually Arguments. If you think this command may be usefull for other users and want to add it to the Module, just contact me.
 
 ### Global device
 - deviceClear() : clear all DS100 settings
@@ -54,9 +63,9 @@ Here is the command list, if you need to know more about parameters type and ran
 
 - coordinateMappingSourcePositionXY(mapping, object, position) : set a specific sound object position in a specified coordinate mapping, with DS100 cartesian XY standard limits (0,0)-(1,1)
 
-- coordinateMappingSourcePosition2DCartesian(mapping, object, position) : set a specific sound object position in a specified coordinate mapping, with Chataigne Point2D axis (center @(0.5,0.5), limits (-1,-1)-(1,1)), output to standard DS100 coordinates.
+- coordinateMappingSourcePosition2DCartesian(mapping, object, position) : set a specific sound object position in a specified coordinate mapping, with Chataigne Point2D axis ( limits (-1,-1)-(1,1)), output to default DS100 coordinate mapping, center (0,0) from Chataigne will be @(0.5,0.5), and limits for (X,Y):(0,0)-(1,1).
 
-- coordinateMappingSourcePosition2DPolar(mapping, object, azimuth, distance) : set a specific sound object position in a specified coordinate mapping, in polar coordinates (azimuth,distance), with center @(0.5,0.5). azimuth & distance are floats, range 0-1, output to standard DS100 coordinates.
+- coordinateMappingSourcePosition2DPolar(mapping, object, azimuth, distance) : set a specific sound object position in a specified coordinate mapping, in polar coordinates (azimuth,distance), azimuth & distance are floats, range 0-1, output to default DS100 coordinate mapping with center @(0.5,0.5), and limits for (X,Y):(0,0)-(1,1).
 
 - reverbSendGain(object, gain) : set the EnSpace reverb level send for a specific object
 
