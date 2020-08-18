@@ -3,7 +3,7 @@
 	"type": "OSC",
 	"path": "Hardware",
 	
-	"version": "1.0.1",
+	"version": "1.2.0",
 	"description": "Module to control sound objects with the d&b DS100 OSC command API. Visit https://www.dbsoundscape.com/ to learn more about d&b Soundscape and DS100, especially download the TI501 'd&b Soundscape System design and operation' and DS100 OSC protocol white paper.",
 	"url": "https://github.com/madees/dbaudio-DS100-Chataigne-Module",
 	"downloadURL": "https://github.com/madees/dbaudio-DS100-Chataigne-Module/archive/master.zip",
@@ -34,27 +34,34 @@
 	},
 	
 	"parameters": {
+		"Update Rate": {
+			"description":"Automatically get the module containers values updated from device. Rate by second, default is 20 Hz (50ms interval).",
+			"type": "Integer",
+			"default": 20,
+			"min":1,
+			"max":50
+		},
+		"Get SoundObjects": {
+			"description":"Update automatically SoundObjects container values",
+			"type": "Boolean",
+			"default":false
+		},
+		"Get Scenes": {
+			"description":"Update automatically Scenes container values",
+			"type": "Boolean",
+			"default":false
+		},
+		"Get EnSpace": {
+			"description":"Update automatically EnSpace container values",
+			"type": "Boolean",
+			"default":false
+		},
 		"Default Coordinate Mapping": {
+			"description":"Set global sound object DS100 coordinate mapping area, if its value is 0",
 			"type": "Integer",
 			"default": 1,
 			"min": 1,
 			"max": 4
-		},
-		"EnSpace Reverb Room" : {
-			"type": "Enum",
-			"options":
-					{
-						"0: Off":0,
-						"1: Modern Small":1,
-						"2: Classic Small":2,
-						"3: Modern Medium":3,
-						"4: Classic Medium":4,
-						"5: Modern Large":5,
-						"6: Classic Large":6,
-						"7: Modern Medium 2":7,
-						"8: Theater Small":8,
-						"9: Cathedral":9
-					}
 		}
 	},
 	
@@ -69,27 +76,83 @@
 
 			"Click to update all":
 			{
-				"type":"Trigger"
+				"type":"Trigger",
+				"description":"Those field won't update automatically, press this button to retrieve actual status if needed"
 			},
 			"Device Name":
 			{
-				"type":"String"
+				"type":"String",
+				"description":"DS100 name, as specified in R1 project"
 			},
 			"Serial Number":
 			{
-				"type":"String"
+				"type":"String",
+				"description":"DS100 device serial"
 			},
 			"Is there anybody out there":
 			{
-				"type":"Boolean"
+				"type":"Boolean",
+				"description":"Check if a device is there to answer to OSC commands"
 			},
 			"Error":
 			{
-				"type":"Boolean"
+				"type":"Boolean",
+				"description":"Something wrong happens with DS100"
 			},
 			"Error text":
 			{
+				"type":"String",
+				"description":"What's wrong"
+			}
+		},
+		"Scenes":
+		{
+			"type":"Container",
+
+			"Scene Index":
+			{
+				"type":"String",
+				"description":"Actual scene index is two integers split by a dot"
+			},
+			"Scene Name":
+			{
+				"type":"String",
+				"description":"As specified in R1"
+			},
+			"Scene Comment":
+			{
+				"type":"String",
+				"description":"As specified in R1"
+			}
+		},
+		"EnSpace": 
+		{
+			"type":"Container",
+
+			"RoomID":
+			{
+				"type":"Integer",
+				"description":"Room selector (0:Off, 1: Modern Small, 2: Classic Small, 3: Modern Medium, 4: Classic Medium, 5: Modern Large, 6: Classic Large, 7: Modern Medium, 8: Theater Small, 9: Cathedral)",
+				"min":0,
+				"max":9
+			},
+			"Room Description":
+			{
 				"type":"String"
+			},
+			"Predelay Factor":
+			{
+				"type":"Float",
+				"description":"",
+				"min":0.2,
+				"max":2
+			},
+			"Rear Level":
+			{
+				"type":"Float",
+				"description":"",
+				"min":-24,
+				"max":24
 			}
 		}
 	},
@@ -122,7 +185,7 @@
 
 		"reverbRoomId":
 		{
-			"menu":"",
+			"menu":"EnSpace",
 			"callback":"reverbRoomId",
 			"parameters":
 			{
@@ -131,6 +194,36 @@
 					"type":"Integer",
 					"min":0,
 					"max":9
+				}
+			}
+		},
+
+		"preDelayFactor":
+		{
+			"menu":"EnSpace",
+			"callback":"preDelayFactor",
+			"parameters":
+			{
+				"Factor":
+				{
+					"type":"Float",
+					"min":0.2,
+					"max":2
+				}
+			}
+		},
+
+		"rearLevel":
+		{
+			"menu":"EnSpace",
+			"callback":"rearLevel",
+			"parameters":
+			{
+				"Rear level":
+				{
+					"type":"Float",
+					"min":-24,
+					"max":24
 				}
 			}
 		},
@@ -344,6 +437,18 @@
 					"type":"Float",
 					"min":-120,
 					"max":24
+				}
+			}
+		},
+		"matrixInputMute":
+		{
+			"menu":"Sound Objects",
+			"callback":"matrixInputMute",
+			"parameters":
+			{
+				"Mute":
+				{
+					"type":"Boolean"
 				}
 			}
 		}
