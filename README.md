@@ -13,23 +13,25 @@ or join us on Discord :
 https://discord.com/invite/ngnJ5z my contact there is also "madees".
 
 ## Installation
-To install the Custom Module, just copy the folder in My Documents\Chataigne\modules or use the "Comunity Modules Manager" in Chataigne>File menu.
+To install the Custom Module, just copy the folder in My Documents\Chataigne\modules.
 You'll find the module in the Module Manager>Hardware>Community Modules.
-# Important notice
-This module has been developped with Chataigne v1.7.5, which is still in beta. We don't waranty a 100% stable usage, so please make internal test before using it on a show.
+
+## Principle of use
+You may use Module Commands to change DS100 parameters, and Module Values to retrieve its parameters.
+Values are read only, and from now you can see only one Sound Object at a time in SoundObjects container, but you can change the SoundObject ID you want to retreive as a parameter. When you change this ID, it will retreive automatically all the container values of the corresponding SoundObject once, even if you don't use "Get SoundObjects" auto update function.
 
 ## Module interface
-First, Module parameters :
+First, global Module parameters :
 #### - Update rate
 OSC reception pooling rate, in Hz. Default recommended value is 20Hz, minimum is 0.2 Hz (5 seconds), maximum is 50 Hz (20 ms). If you don't need to retrieve values container below, you can de-activate the "get" commands, for example if Chataigne is the only controling device or just send commands. If your application is not time critical in terms of real time feedback of DS100 object parameters, you can lower the rate and save ressources and network bandwitdth.
 
 #### - Get SoundObjects, Get Scenes, Get EnSpace
 Send commands to DS100 to retrieve corresponding values container datas from device, at update rate specified above. If you don't need continuous feedback from device, you can deactivate those functions, it will reduce OSC/DS100 load and network traffic bandwidth.
-Default values are "false" (off) so the module is "OSC quiet" and only send commands when needed, no automatic update to retrieve those containers values.
+Default values are "false" (off) so the module is "OSC output quiet" when no Commands are sent by your Noisette, those containers values will update only when you use corresponding Commands, and so the device answers back to confirm reception and parameters changes.
 
 #### - Default Coordinate Mapping
 Used in all commands that need to specify a coordinate mapping.
-If you set in command or soundObject.values.mapping parameter at 0, it will use this default value instead.
+If you set it at 0 in SoundObject positionning Commands, it will use this default value instead.
 
 #### - OSC Input port
 Preset to DS100 talking port (50011) and local IP.
@@ -40,22 +42,23 @@ Default IP address setting is 192.168.1.100. You can change it there if necessar
 
 #### - Values>DS100 Device status
 This container gives some usefull informations about the device. As they are configuration settings, those values are not updated automatically.
-So the only action there is a trigger "Click to update all", that will collect the Device infos.
+So the only action there is a trigger "Click to update all", that will collect those Device infos.
 All others values are read only.
-"Is there anybody out there" indicator is turning blue when the Device answers to Ping.
+"Is there anybody out there" indicator is turning blue when the Device answers to Ping Command.
 
 #### - Values>Scenes
 This container shows actual scene index, name and comment. Read only.
-Use commands to change scene (index, previous, next).
-If "Get Scenes" module parameter is on, the values will be retrieved  from device automatically, at Update Rate.
+Use Commands to change scene (index, previous, next).
+If "Get Scenes" module parameter is on, the values will be retrieved  from device continuously at Update Rate. If not, you'll have update only when the device sent them to you, generally by answering back when you change the scene with a Command.
 
 #### - Values>EnSpace
-This container shows actual EnSpace reverberation settings. You can change directly values, it will send automatically commands. 
-If "Get EnSpace" module parameter is on, the values will be retrieved automatically from device automatically, at Update Rate.
+This container shows actual EnSpace reverberation settings. Read only.
+If "Get EnSpace" module parameter is on, the values will be retrieved from device continuously at Update Rate. If not, you'll have update only when the device sent them to you, generally by answering back when you change those parameters with corresponding Commands.
 
 #### - Values>SoundObjects>SoundObject0
-This container receives one soundObject datas. Its ID is the "input" parameter, so you can choose which object you want to control, the communication is bidirectional. So if you change the object ID, all its actual values will be updated, and next you can control it thru commands or values.
-If "Get SoundObjects" module parameter is on, the values will also be retrieved from device, at Update Rate.
+This container receives one soundObject parameters. Read only except SoundObject ID.
+Its ID correspond to the "matrix input" number, so you can choose which object you want to retreive parameters.
+If "Get SoundObjects" module parameter is on, the values will be retrieved continuously at Update Rate. If not, you'll have update only when the device sent them to you, generally by answering back when you change this SoundObject parameters with a command.
 
 ## Commands
 Commands are ready to use in your scripts, with the "Command tester" tool, or as outputs from the State machine and Sequences in Time Machine. As an example, you can create a Sequence, add a Mapping 2D and use as outputs the command coordinateMappingPosition2DCartesian to generate sound objects displacements cues.
@@ -71,9 +74,9 @@ Here is the command list, if you need to know more about arguments type and rang
 If you need one OSC command that isn't in the module yet, (for example, matrix control), the command Custom Message is there in the module for that purpose. Just add the OSC string from documentation above and eventually Arguments. If you think this command may be usefull for other users and want to add it to the Community Module, please contact us thru Chataigne Discord or Forum : http://benjamin.kuperberg.fr/chataigne/en/#community
 
 ### Global device
-- deviceClear() : clear all DS100 values settings !!! Use with care
+- deviceClear() : clear all DS100 values settings !!! Use with care (confirmation Popup window)
 
-- masterOutputLevel(gain) : set global output level with overwriting all DS100 outputs levels !!! Use with care
+- masterOutputLevel(gain) : set global output level by overwriting all DS100 outputs levels !!! Use with care
 
 ### Scenes manipulation
 - nextScene() : switch to next scene
@@ -95,6 +98,10 @@ If you need one OSC command that isn't in the module yet, (for example, matrix c
 - sourceDelayMode(object, mode) : set the delay mode of a specific sound object
 
 - coordinateMappingSourcePositionXY(mapping, object, position) : set a specific sound object position in a specified coordinate mapping, with DS100 cartesian XY standard limits (0,0)-(1,1)
+
+- coordinateMappingSourcePositionX(mapping, object, position) : set a specific sound object X only position in a specified coordinate mapping, range 0-1
+
+- coordinateMappingSourcePositionY(mapping, object, position) : set a specific sound object Y only position in a specified coordinate mapping, range 0-1
 
 - coordinateMappingSourcePosition2DCartesian(mapping, object, position) : set a specific sound object position in a specified coordinate mapping, with Chataigne Point2D axis ( limits (-1,-1)-(1,1)), output to default DS100 coordinate mapping, center (0,0) from Chataigne will be @(0.5,0.5), and limits for (X,Y):(0,0)-(1,1).
 

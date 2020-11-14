@@ -3,8 +3,8 @@
 	"type": "OSC",
 	"path": "Hardware",
 	
-	"version": "1.2.0",
-	"description": "Module to control sound objects with the d&b DS100 OSC command API. Visit https://www.dbsoundscape.com/ to learn more about d&b Soundscape and DS100, especially download the TI501 'd&b Soundscape System design and operation' and DS100 OSC protocol white paper.",
+	"version": "1.4.0",
+	"description": "Module to control the d&b audiotechnik DS100 by OSC.\n\nPlease visit https://www.dbsoundscape.com/ to learn more about d&b Soundscape and DS100, especially download the TI501 'd&b Soundscape System design and operation' and DS100 OSC protocol white paper.\n\nChataigne Module specific documentation can be found in the README on GitHub:",
 	"url": "https://github.com/madees/dbaudio-DS100-Chataigne-Module",
 	"downloadURL": "https://github.com/madees/dbaudio-DS100-Chataigne-Module/archive/master.zip",
 	
@@ -16,7 +16,8 @@
 		"autoFeedback",
 		"pass_through",
 		"input",
-		"outputs"
+		"outputs",
+		"useHierarchy"
 	],
 	
 	"defaults": {
@@ -35,29 +36,29 @@
 	
 	"parameters": {
 		"Update Rate": {
-			"description":"Automatically get the module containers values updated from device. Rate by second, default is 20 Hz (50ms interval).",
+			"description":"Automatically get the module containers values updated from device.\nRate by second, default is 20 Hz (50ms interval).\n",
 			"type": "Integer",
 			"default": 20,
 			"min":1,
 			"max":50
 		},
 		"Get SoundObjects": {
-			"description":"Update automatically SoundObjects container values",
+			"description":"Update automatically SoundObjects container values.\n",
 			"type": "Boolean",
 			"default":false
 		},
 		"Get Scenes": {
-			"description":"Update automatically Scenes container values",
+			"description":"Update automatically Scenes container values.\n",
 			"type": "Boolean",
 			"default":false
 		},
 		"Get EnSpace": {
-			"description":"Update automatically EnSpace container values",
+			"description":"Update automatically EnSpace container values.\n",
 			"type": "Boolean",
 			"default":false
 		},
 		"Default Coordinate Mapping": {
-			"description":"Set global sound object DS100 coordinate mapping area, if its value is 0",
+			"description":"Set global sound object DS100 coordinate mapping area, if its value is 0.\n",
 			"type": "Integer",
 			"default": 1,
 			"min": 1,
@@ -77,32 +78,32 @@
 			"Click to update all":
 			{
 				"type":"Trigger",
-				"description":"Those field won't update automatically, press this button to retrieve actual status if needed"
+				"description":"Update actual device status.\n"
 			},
 			"Device Name":
 			{
 				"type":"String",
-				"description":"DS100 name, as specified in R1 project"
+				"description":"DS100 name, as specified in R1 project.\n"
 			},
 			"Serial Number":
 			{
 				"type":"String",
-				"description":"DS100 device serial"
+				"description":"DS100 device serial.\n"
 			},
 			"Is there anybody out there":
 			{
 				"type":"Boolean",
-				"description":"Check if a device is there to answer to OSC commands"
+				"description":"Check if a device is there to answer to OSC commands.\n"
 			},
 			"Error":
 			{
 				"type":"Boolean",
-				"description":"Something wrong happens with DS100"
+				"description":"Something wrong happens with DS100.\n"
 			},
 			"Error text":
 			{
 				"type":"String",
-				"description":"What's wrong"
+				"description":"What's wrong?\n"
 			}
 		},
 		"Scenes":
@@ -112,45 +113,46 @@
 			"Scene Index":
 			{
 				"type":"String",
-				"description":"Actual scene index is two integers split by a dot"
+				"description":"Actual scene index is two integers split by a dot.\n"
 			},
 			"Scene Name":
 			{
 				"type":"String",
-				"description":"As specified in R1"
+				"description":"As specified in d&b R1.\n"
 			},
 			"Scene Comment":
 			{
 				"type":"String",
-				"description":"As specified in R1"
+				"description":"As specified in d&b R1.\n"
 			}
 		},
 		"EnSpace": 
 		{
 			"type":"Container",
 
-			"RoomID":
+			"Room ID":
 			{
-				"type":"Integer",
-				"description":"Room selector (0:Off, 1: Modern Small, 2: Classic Small, 3: Modern Medium, 4: Classic Medium, 5: Modern Large, 6: Classic Large, 7: Modern Medium, 8: Theater Small, 9: Cathedral)",
+				"type": "Integer",
+				"description":"Integer to specify EnSpace room.\n",
 				"min":0,
-				"max":9
+				"max":9,
 			},
 			"Room Description":
 			{
-				"type":"String"
+				"type":"String",
+				"description":"String to describe EnSpace room.\n"
 			},
 			"Predelay Factor":
 			{
 				"type":"Float",
-				"description":"",
+				"description":"EnSpace pre delay factor.\n",
 				"min":0.2,
 				"max":2
 			},
 			"Rear Level":
 			{
 				"type":"Float",
-				"description":"",
+				"description":"EnSpace rear level.\n",
 				"min":-24,
 				"max":24
 			}
@@ -301,14 +303,64 @@
 				},
 				"Delay Mode":
 				{
-					"type":"Enum",
-					"options":
-					{
-						"Off":0,
-						"Tight":1,
-						"Full":2
-					}
+					"type":"Integer",
+					"min":0,
+					"max":2
 				}
+			}
+		},
+
+		"coordinateMappingSourcePositionX":
+		{
+			"menu":"Sound Objects",
+			"callback":"coordinateMappingSourcePositionX",
+			"parameters":
+			{
+				"Mapping":
+				{
+					"type":"Integer",
+					"min":0,
+					"max":4
+				},
+				"Object":
+				{
+					"type":"Integer",
+					"min":1,
+					"max":64
+				},
+				"X Position":
+				{
+					"type":"Float",
+					"min":0,
+					"max":1
+				}	
+			}
+		},
+
+		"coordinateMappingSourcePositionY":
+		{
+			"menu":"Sound Objects",
+			"callback":"coordinateMappingSourcePositionY",
+			"parameters":
+			{
+				"Mapping":
+				{
+					"type":"Integer",
+					"min":0,
+					"max":4
+				},
+				"Object":
+				{
+					"type":"Integer",
+					"min":1,
+					"max":64
+				},
+				"Y Position":
+				{
+					"type":"Float",
+					"min":0,
+					"max":1
+				}	
 			}
 		},
 
@@ -446,6 +498,12 @@
 			"callback":"matrixInputMute",
 			"parameters":
 			{
+				"Object":
+				{
+					"type":"Integer",
+					"min":1,
+					"max":64
+				},
 				"Mute":
 				{
 					"type":"Boolean"
