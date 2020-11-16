@@ -213,7 +213,7 @@ function oscEvent(address, args)
 	{	
 		if(local.match(address, OSCPosition+"*/"+soundObjectID)) // This is a sound object positioning XY values
 		{
-			soundObject.coordinateMapping.set(parseInt(address.substring(OSCposition.length, OSCposition.length+1)));
+			soundObject.coordinateMapping.set(parseInt(address.substring(OSCPosition.length, OSCPosition.length+1)));
 			soundObject.position.set(args[0], args[1]);
 		}
 		else if (local.match(address, OSCInputGain+soundObjectID)) // this is a sound object (matrix input) level
