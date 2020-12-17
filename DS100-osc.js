@@ -1,4 +1,4 @@
-/* Chataigne Module for d&b audiotechnik DS100 OSC v1.4.0 (c) Mathieu Delquignies, 10/2020
+/* Chataigne Module for d&b audiotechnik DS100 OSC v1.4.1 (c) Mathieu Delquignies, 10/2020
 ===============================================================================
 This file is a Chataigne Custom Module to remote control d&b audiotechnik DS100.
 
@@ -665,7 +665,7 @@ function rxSceneComment(address, args)
  */
 function rxRoomID(address, args)
 {
-	local.values.enSpace.roomID.setData(args[0]);
+	local.values.enSpace.roomID.set(args[0]);
 	if(args[0]==0) local.values.enSpace.roomDescription.set("EnSpace off");
 	else if (args[0]==1) local.values.enSpace.roomDescription.set("Modern - small");
 	else if (args[0]==2) local.values.enSpace.roomDescription.set("Classic - small");
