@@ -3,7 +3,7 @@
 	"type": "OSC",
 	"path": "Hardware",
 	
-	"version": "1.4.1",
+	"version": "1.5",
 	"description": "Module to control the d&b audiotechnik DS100 by OSC.\n\nPlease visit https://www.dbsoundscape.com/ to learn more about d&b Soundscape and DS100, especially download the TI501 'd&b Soundscape System design and operation' and DS100 OSC protocol white paper.\n\nChataigne Module specific documentation can be found in the README on GitHub:",
 	"url": "https://github.com/madees/dbaudio-DS100-Chataigne-Module",
 	"downloadURL": "https://github.com/madees/dbaudio-DS100-Chataigne-Module/archive/master.zip",
@@ -12,6 +12,7 @@
 	"hasOutput": true, 
 	"hideDefaultCommands": false,
 	"hideDefaultParameters": [
+		"colorSendMode",
 		"autoRange",
 		"autoFeedback",
 		"pass_through",
@@ -316,13 +317,13 @@
 			"callback":"coordinateMappingSourcePositionX",
 			"parameters":
 			{
-				"Mapping":
+				"Coordinate Mapping":
 				{
 					"type":"Integer",
 					"min":0,
 					"max":4
 				},
-				"Object":
+				"Sound Object #":
 				{
 					"type":"Integer",
 					"min":1,
@@ -343,13 +344,13 @@
 			"callback":"coordinateMappingSourcePositionY",
 			"parameters":
 			{
-				"Mapping":
+				"Coordinate Mapping":
 				{
 					"type":"Integer",
 					"min":0,
 					"max":4
 				},
-				"Object":
+				"Sound Object #":
 				{
 					"type":"Integer",
 					"min":1,
@@ -370,19 +371,19 @@
 			"callback":"coordinateMappingSourcePositionXY",
 			"parameters":
 			{
-				"Mapping":
+				"Coordinate Mapping":
 				{
 					"type":"Integer",
 					"min":0,
 					"max":4
 				},
-				"Object":
+				"Sound Object #":
 				{
 					"type":"Integer",
 					"min":1,
 					"max":64
 				},
-				"Position":
+				"Position (X,Y)":
 				{
 					"type":"Point2D",
 					"min":[0,0],
@@ -397,19 +398,19 @@
 			"callback":"coordinateMappingSourcePosition2DCartesian",
 			"parameters":
 			{
-				"Mapping":
+				"Coordinate Mapping":
 				{
 					"type":"Integer",
 					"min":0,
 					"max":4
 				},
-				"Object":
+				"Sound Object #":
 				{
 					"type":"Integer",
 					"min":1,
 					"max":64
 				},
-				"Position":
+				"Position (X,Y)":
 				{
 					"type":"Point2D",
 					"min":[-1,-1],
@@ -424,13 +425,13 @@
 			"callback":"coordinateMappingSourcePosition2DPolar",
 			"parameters":
 			{
-				"Mapping":
+				"Coordinate Mapping":
 				{
 					"type":"Integer",
 					"min":0,
 					"max":4
 				},
-				"Object":
+				"Sound Object #":
 				{
 					"type":"Integer",
 					"min":1,
@@ -457,7 +458,7 @@
 			"callback":"reverbSendGain",
 			"parameters":
 			{
-				"Object":
+				"Sound Object #":
 				{
 					"type":"Integer",
 					"min":1,
@@ -478,7 +479,7 @@
 			"callback":"matrixInputGain",
 			"parameters":
 			{
-				"Object":
+				"Sound Object #":
 				{
 					"type":"Integer",
 					"min":1,
@@ -498,7 +499,7 @@
 			"callback":"matrixInputMute",
 			"parameters":
 			{
-				"Object":
+				"Sound Object #":
 				{
 					"type":"Integer",
 					"min":1,
@@ -507,6 +508,56 @@
 				"Mute":
 				{
 					"type":"Boolean"
+				}
+			}
+		},
+		"FGOutputMute":
+		{
+			"menu":"Sound Objects",
+			"callback":"FGOutputMute",
+			"parameters":
+			{
+				"Sound Object #":
+				{
+					"type":"Integer",
+					"min":1,
+					"max":64
+				},
+				"Function Group #":
+				{
+					"type":"Integer",
+					"min":1,
+					"max":16
+				},
+				"Mute":
+				{
+					"type":"Boolean"
+				}
+			}
+		},
+		"FGOutputGain":
+		{
+			"menu":"Sound Objects",
+			"callback":"FGOutputGain",
+			"parameters":
+			{
+				"Sound Object #":
+				{
+					"type":"Integer",
+					"min":1,
+					"max":64
+				},
+				"Function Group #":
+				{
+					"type":"Integer",
+					"min":1,
+					"max":16
+				},
+				"Gain dB":
+				{
+					"type":"Float",
+					"min":-120,
+					"max":24
 				}
 			}
 		}

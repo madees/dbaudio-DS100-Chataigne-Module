@@ -57,6 +57,8 @@ var OSCSceneIndex = "/dbaudio1/scene/sceneindex";
 var OSCSceneName = "/dbaudio1/scene/scenename";
 var OSCSceneComment = "/dbaudio1/scene/scenecomment";
 var OSCInputMute = "/dbaudio1/matrixinput/mute/";
+var OSCFGOutputGain = "/dbaudio1/soundobjectrouting/gain/";
+var OSCFGOutputMute = "/dbaudio1/soundobjectrouting/mute/";
 
 /** 
  * Global variables
@@ -575,6 +577,29 @@ function matrixInputMute(object, state)
 {
 	local.send(OSCInputMute + object, state);
 }
+
+
+/**
+ * Set a specific sound object level within a specific FG
+ * @param {integer} object 
+ * @param {integer} FG (Function Group, from 1 to 16)
+ * @param {float} gain (from -120 to +24 in dB)
+ */
+ function FGOutputGain(object, FG, gain)
+ {
+	 local.send(OSCFGOutputGain + FG + "/" + object, gain);
+ }
+ 
+ /**
+  * Set a specific sound object matrix input mute state
+  * @param {integer} object
+  *  * @param {integer} FG (Function Group, from 1 to 16)
+  * @param {boolean} state 
+  */
+ function FGOutputMute(object, FG, state)
+ {
+	 local.send(OSCFGOutputMute + FG + "/" + object, state);
+ }
 /*	===============================================================================
 	OSC rx parsers (from registered callback, others from OSCevent function)
 	===============================================================================
