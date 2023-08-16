@@ -1,4 +1,4 @@
-/* Chataigne Module for d&b audiotechnik DS100 OSC v1.4.1 (c) Mathieu Delquignies, 10/2020
+/* Chataigne Module for d&b audiotechnik DS100 OSC v1.6 (c) Mathieu Delquignies, 3/2023
 ===============================================================================
 This file is a Chataigne Custom Module to remote control d&b audiotechnik DS100.
 

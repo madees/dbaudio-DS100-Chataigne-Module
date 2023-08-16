@@ -1,13 +1,5 @@
 # dbaudio-DS100-Chataigne-Module
-Chataigne module to control d&amp;b audiotechnik DS100 matrix hardware with OSC protocol.
-
-This community module is NOT OFFICIALLY supported by d&b audiotechnik.
-It is publicly available to enable interested users to experiment, extend and create their own adaptations.
-There is no guarantee for compatibility inbetween versions or for the implemented functionality to be reliable for professional.
-Use what is provided here at your own risk!
-
-That being said, of course I've done my best to provide a fully functionnal and reliable module, and as much support as I can.
->>> V1.5 has been updated and tested for DS100 FW v1.14 and Chataigne v1.8
+Chataigne module to control d&amp;b audiotechnik DS100 matrix hardware with OSC protocol.  
 
 To learn more about Chataigne, please visit : http://benjamin.kuperberg.fr/chataigne/
 
@@ -21,13 +13,12 @@ or join us on Discord :
 https://discord.com/invite/ngnJ5z my contact there is also "madees".
 
 ## Installation
-To install the Custom Module, just copy the folder in My Documents\Chataigne\modules.
+To install the Custom Module, it's very easy inside Chataigne :
+Go to File menu>Community Module Manager
 You'll find the module in the Module Manager>Hardware>Community Modules.
 
 ## Principle of use
-You may use first Commands to control any DS100 parameters easily.
-
-Next, Values to retrieve DS100 parameters: some are globals, others are specific to one Sound Object.
+You may use Module Commands to change DS100 parameters, and Module Values to retrieve its parameters.
 Values are read only, and from now you can see only one Sound Object at a time in SoundObjects container, but you can change the SoundObject ID you want to retreive as a parameter. When you change this ID, it will retreive automatically all the container values of the corresponding SoundObject once, even if you don't use "Get SoundObjects" auto update function.
 
 ## Module interface
@@ -122,7 +113,3 @@ If you need one OSC command that isn't in the module yet, (for example, matrix c
 - matrixInputGain(object, gain) : set a specific sound object level
 
 - matrixInputMute(object, boolean) : set a specific sound object mute state
-
-- FGOutputGain(object, FG, gain) : set a specific sound object level in a specific Function Group
-
-- FGOutputMute(object, FG, boolean) : set a specific sound object mute state in a specific Function Group
