@@ -1,9 +1,9 @@
 {
-	"name": "d&b DS100 OSC Control",
+	"name": "d&b DS100",
 	"type": "OSC",
 	"path": "Hardware",
 	
-	"version": "1.6",
+	"version": "2.0",
 	"description": "Module to control the d&b audiotechnik DS100 by OSC.\n\nPlease visit https://www.dbsoundscape.com/ to learn more about d&b Soundscape and DS100, especially download the TI501 'd&b Soundscape System design and operation' and DS100 OSC protocol white paper.\n\nChataigne Module specific documentation can be found in the README on GitHub:",
 	"url": "https://github.com/madees/dbaudio-DS100-Chataigne-Module",
 	"downloadURL": "https://github.com/madees/dbaudio-DS100-Chataigne-Module/archive/master.zip",
@@ -20,6 +20,11 @@
 		"outputs",
 		"useHierarchy",
 		"colorSendMode",
+		"autoAdd",
+		"oscInput/localPort",
+		"oscOutputs/oscOutput/remotePort",
+		"oscOutputs/oscOutput/listenToFeedback",
+		"oscOutputs/oscOutput/local",
 		"booleanSendMode"
 	],
 	
@@ -45,10 +50,20 @@
 			"min":1,
 			"max":50
 		},
-		"Get SoundObjects": {
-			"description":"Update automatically SoundObjects container values.\n",
+		"Get parametric SO": {
+			"description":"Update automatically Parametric Sound Object container values.\n",
 			"type": "Boolean",
 			"default":false
+		},
+		"Get SO Positions XYZ": {
+			"description":"Update automatically Sound Objects Positions containers values.\n",
+			"type": "Boolean",
+			"default":false
+		},
+		"Get SO Positions range": {
+			"description":"Pattern or wildcard (ex. [1-16], {1,4,42} or wildcard ? or *).\n\n* is default, for all objects.\n",
+			"type": "String",
+			"default":"*"
 		},
 		"Get Scenes": {
 			"description":"Update automatically Scenes container values.\n",
@@ -61,7 +76,7 @@
 			"default":false
 		},
 		"Default Coordinate Mapping": {
-			"description":"Set global sound object DS100 coordinate mapping area, if its value is 0.\n",
+			"description":"Set global sound object DS100 coordinate mapping area, if its command setting is 0.\n",
 			"type": "Integer",
 			"default": 1,
 			"min": 1,
@@ -107,6 +122,11 @@
 			{
 				"type":"String",
 				"description":"What's wrong?\n"
+			},
+			"Sampling rate":
+			{
+				"type":"String",
+				"description":"Audio network card sampling rate.\n"
 			}
 		},
 		"Scenes":
@@ -138,7 +158,7 @@
 				"type": "Integer",
 				"description":"Integer to specify EnSpace room.\n",
 				"min":0,
-				"max":9,
+				"max":9
 			},
 			"Room Description":
 			{
@@ -367,6 +387,33 @@
 			}
 		},
 
+		"coordinateMappingSourcePositionZ":
+		{
+			"menu":"Sound Objects",
+			"callback":"coordinateMappingSourcePositionZ",
+			"parameters":
+			{
+				"Coordinate Mapping":
+				{
+					"type":"Integer",
+					"min":0,
+					"max":4
+				},
+				"Sound Object #":
+				{
+					"type":"Integer",
+					"min":1,
+					"max":64
+				},
+				"Z Position":
+				{
+					"type":"Float",
+					"min":0,
+					"max":1
+				}	
+			}
+		},
+
 		"coordinateMappingSourcePositionXY":
 		{
 			"menu":"Sound Objects",
@@ -394,10 +441,37 @@
 			}
 		},
 
-		"coordinateMappingSourcePosition2DCartesian":
+		"coordinateMappingSourcePoint3D":
 		{
 			"menu":"Sound Objects",
-			"callback":"coordinateMappingSourcePosition2DCartesian",
+			"callback":"coordinateMappingSourcePoint3D",
+			"parameters":
+			{
+				"Coordinate Mapping":
+				{
+					"type":"Integer",
+					"min":0,
+					"max":4
+				},
+				"Sound Object #":
+				{
+					"type":"Integer",
+					"min":1,
+					"max":64
+				},
+				"Position (X,Y,Z)":
+				{
+					"type":"Point3D",
+					"min":[0,0,0],
+					"max":[1,1,1]
+				}	
+			}
+		},
+
+		"coordinateMappingSourcePoint2D":
+		{
+			"menu":"Sound Objects",
+			"callback":"coordinateMappingSourcePoint2D",
 			"parameters":
 			{
 				"Coordinate Mapping":
@@ -421,10 +495,10 @@
 			}
 		},
 
-		"coordinateMappingSourcePosition2DPolar":
+		"coordinateMappingSourcePositionPolar":
 		{
 			"menu":"Sound Objects",
-			"callback":"coordinateMappingSourcePosition2DPolar",
+			"callback":"coordinateMappingSourcePositionPolar",
 			"parameters":
 			{
 				"Coordinate Mapping":
