@@ -85,6 +85,10 @@ Commands are ready to use with the "Command tester" tool, or as outputs from the
 - object is sound object (input matrix channel), integer, 1 to 64 range
 - mapping is the DS100 coordinate mapping area as specified in R1, integer. 0 will use the global module parameter, or specific area form 1 to 4.
 
+#### What's the difference between Point2D, Polar and Position XY ?
+For ease of use, there are several 2D positionning commands, with different ranges and center positions :
+![Positionning of Sound Objects](/SourcePositionDS100module.jpg)
+
 Here is the command list, if you need to know more about arguments type and ranges, please refer to the https://www.dbaudio.com/assets/products/downloads/manuals-documentation/electronics/dbaudio-osc-protocol-ds100-1.3.7-en.pdf
 
 - Custom Message() :
