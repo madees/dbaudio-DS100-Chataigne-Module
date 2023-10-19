@@ -1,4 +1,4 @@
-/* Chataigne Module for d&b audiotechnik DS100 OSC v2.0 (c) Mathieu Delquignies, 6/2023
+/* Chataigne Module for d&b audiotechnik DS100 OSC v2.1 (c) Mathieu Delquignies, 10/2023
 ===============================================================================
 This file is a Chataigne Custom Module to remote control d&b audiotechnik DS100.
 
@@ -62,6 +62,7 @@ var OSCInputMute = "/dbaudio1/matrixinput/mute/";
 var OSCFGOutputGain = "/dbaudio1/soundobjectrouting/gain/";
 var OSCFGOutputMute = "/dbaudio1/soundobjectrouting/mute/";
 var OSCSRStatus = "/dbaudio1/status/audionetworksamplestatus";
+var OSCMeter ="/dbaudio1/matrixinput/levelmeterpremute/";
 
 /** 
  * Global variables
@@ -118,6 +119,8 @@ function init()
 	var spread = parametricSOContainer.addFloatParameter("Spread", "object spread", 0, 0, 1);
 	spread.setAttribute("readonly", true);
 	var reverb = parametricSOContainer.addFloatParameter("Reverb", "EnSpace send level", 0, -120, 24);
+	reverb.setAttribute("readonly", true);
+	var meter = parametricSOContainer.addFloatParameter("Meter", "Level meter pre mute", 0, -120, 0);
 	reverb.setAttribute("readonly", true);
 	// option to see this as integer:
 	var mode = parametricSOContainer.addIntParameter("Mode", "Delay mode", 0, 0, 2); 
@@ -295,6 +298,10 @@ function oscEvent(address, args)
 		{
 			parametricSOContainer.mute.set(args[0]);	
 		}
+		else if (local.match(address, OSCMeter+soundObjectID)) // this is the channel level metering (pre mute)
+		{
+			parametricSOContainer.meter.set(args[0]);
+		}
 		else 
 		{
 		script.logWarning("OSC Event parser received useless OSC messages: " + address + " " + args);
@@ -327,6 +334,7 @@ function updateSoundObject(id)
 		local.send(OSCRevGain + id);
 		local.send(OSCDelayMode + id);
 		local.send(OSCInputMute + id);
+		local.send(OSCMeter + id);
 	}
 }
 
@@ -543,7 +551,7 @@ function coordinateMappingSourcePoint2D(coordinateMapping, object, position)
 {
 	var pos=[];
 	pos[0]=(1+position[0])/2;
-	pos[1]=(1-position[1])/2;
+	pos[1]=(1+position[1])/2;
 	coordinateMappingSourcePositionXY(coordinateMapping, object, pos);
 }
 
