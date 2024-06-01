@@ -1,4 +1,4 @@
-/* Chataigne Module for d&b audiotechnik DS100 OSC v2.1 (c) Mathieu Delquignies, 10/2023
+/* Chataigne Module for d&b audiotechnik DS100 OSC v2.2 (c) Mathieu Delquignies, 05/2024
 ===============================================================================
 This file is a Chataigne Custom Module to remote control d&b audiotechnik DS100.
 
@@ -76,6 +76,8 @@ var getParametricSO = null;
 var getScenes = null;
 var getEnSpace = null;
 var xyz = [];
+var xy = [];
+var z = [];
 
 /* 	===============================================================================
 *	Chataigne common functions
@@ -133,13 +135,22 @@ function init()
 	mute.setAttribute("readonly", true);
 	parametricSOContainer.setCollapsed(true);
 
-	// Add Sound Objects Positions XYZ container of values
-	SOPositionsContainer = local.values.addContainer("Sound Objects Positions", "X, Y and Z values for each of the 64 objects");
-	// Add XYZ container & values for cartesian X position
+	// Add Sound Objects Positions XYZ, XY and Z container of values
+	SOPositionsContainer = local.values.addContainer("All Sound Objects Positions", "X, Y and Z values for each of the 64 objects");
+	SOXYZContainer = SOPositionsContainer.addContainer("XYZ", "X, Y and Z values for each of the 64 objects");
+	SOXYContainer = SOPositionsContainer.addContainer("XY", "X and Y values for each of the 64 objects");
+	SOZContainer = SOPositionsContainer.addContainer("Z", "Z values for each of the 64 objects");
+
+	// Add XYZ values into those containers
 	for (var i = 1; i < 65; i++) {
-    	xyz[i]= SOPositionsContainer.addPoint3DParameter(i, "XYZ");
+    	xyz[i]= SOXYZContainer.addPoint3DParameter(i, "XYZ");
 		xyz[i].setAttribute("readonly", true);
+		xy[i]= SOXYContainer.addPoint2DParameter(i, "XY");
+		xy[i].setAttribute("readonly", true);
+		z[i]= SOZContainer.addFloatParameter(i, "Z", 0);
+		z[i].setAttribute("readonly", true);
     	};
+	// collapsed as default
     SOPositionsContainer.setCollapsed(true);
 
 	// Setup default reception update rate as in module GUI
@@ -272,6 +283,8 @@ function oscEvent(address, args)
 		{
 			id=parseInt(address.substring(OSCPositionXYZ.length+2, address.length));
 			xyz[id].set(args[0], args[1], args[2]);
+			xy[id].set(args[0], args[1]);
+			z[id].set(args[2]);
 		}
 		else if (local.match(address, OSCInputGain+soundObjectID)) // this is a sound object (matrix input) level
 		{
