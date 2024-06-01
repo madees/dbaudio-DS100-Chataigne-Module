@@ -6,6 +6,9 @@ It is publicly available to enable interested users to experiment, extend and cr
 There is no guarantee for compatibility in between versions or for the implemented functionality to be reliable for professional.
 Use what is provided here at your own risk!
 
+That being said, I took great care to beta test all features with DS100 hardware before commits.
+Please use GitHub Issues and/or contact me on Discord if you see any bug, I'll try to fix it asap !
+
 To learn more about Chataigne, please visit : http://benjamin.kuperberg.fr/chataigne/
 
 And Ben's Youtube channel where you can find tutorials : https://youtu.be/RSBU9MwJNLY
