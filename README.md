@@ -76,7 +76,7 @@ If "Get SoundObjects" module parameter is on, the values will be retrieved conti
 
 #### - Values>Sound Objects Positions
 This container receives all (64) Sound Objects positions (X,Y,Z) triplets in Default Coordinate Mapping from "Get SO Positions XYZ" option.
-Splitted in three sub containers : (X,Y,Z), (X,Y) and Z, to ease mappings, especially in Sequences>Mapping2D>Recorder for multiple objects.
+Splitted in three sub containers : (X,Y,Z), (X,Y) and Z, to ease mappings, especially in Sequences>Mapping2D>Recorder for multiple objects positions, and Z to FG level for elevation effects.
 
 ## Commands
 Commands are ready to use with the "Command tester" tool, or as outputs from the State machine and Sequences in Time Machine, or from your own scripts. As an example, you can create a Sequence, add a Mapping 2D and use as outputs the command coordinateMappingPosition2DCartesian to generate sound objects displacements cues.
