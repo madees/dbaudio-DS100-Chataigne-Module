@@ -37,14 +37,14 @@ Values polling rate, in Hz. Default recommended value is 20Hz (50 ms), minimum i
 As automatic polling of parameters is a big network bandwith consumer, if you don't need to retrieve any values changed by third (applications where you use Chataigne to control the device and send commands only), you should de-activate all the "get" commands as default.
 If your application is not time critical in terms of real time feedback of DS100 object parameters, you can also lower the rate and save ressources and network bandwitdth.
 
-#### - Get parametric SO, SO Positions XYZ, Get Scenes, Get EnSpace
+#### - Get parametric SO, Get SO Positions XYZ, Get SO Levels meters, Get Scenes, Get EnSpace
 Automatically send commands to DS100 to retrieve corresponding values container datas from device, at update rate specified above. 
 
 If you don't need continuous feedback from device, you can deactivate those functions, it will reduce OSC/DS100 load and network traffic bandwidth.
 Default values are "false" (off) so the module is "OSC output quiet" when no Commands are sent by your Noisette, those containers values will update only when you use corresponding Commands, and so the device answers back to confirm reception and parameters changes.
 
-#### - Get SO Positions range
-String to choose which objects are polled. It uses standard OSC wildcards, so "*" means all channel available (64), you can specify only one number, or a range, example [12-24] will do for object 12 to 24. See dbaudio-osc-protocol-ds100-1.3.7-en.pdf page 5 for more examples.
+#### - Get SO Positions / levels range
+String to choose which objects are polled. It uses standard OSC wildcards, so "*" means all channel available (64), you can specify only one number, or a range, example 1[2-8] will do for object 12 to 18, {1,24,40} will do for objects 1, 24 and 40. See dbaudio-osc-protocol-ds100-1.3.7-en.pdf page 5 for more examples.
 
 #### - Default Coordinate Mapping
 Used in all commands that need to specify a coordinate mapping.
