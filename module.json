@@ -3,7 +3,7 @@
 	"type": "OSC",
 	"path": "Hardware",
 	
-	"version": "2.2",
+	"version": "2.3",
 	"description": "Module to control the d&b audiotechnik DS100 by OSC.\n\nPlease visit https://www.dbsoundscape.com/ to learn more about d&b Soundscape and DS100, especially download the TI501 'd&b Soundscape System design and operation' and DS100 OSC protocol white paper.\n\nChataigne Module specific documentation can be found in the README on GitHub:",
 	"url": "https://github.com/madees/dbaudio-DS100-Chataigne-Module",
 	"downloadURL": "https://github.com/madees/dbaudio-DS100-Chataigne-Module/archive/master.zip",
@@ -61,7 +61,17 @@
 			"default":false
 		},
 		"Get SO Positions range": {
-			"description":"Pattern or wildcard (ex. [1-16], {1,4,42} or wildcard ? or *).\n\n* is default, for all objects.\n",
+			"description":"Pattern or wildcard (ex. [1-4], {1,4,42} or wildcard ? or *).\n\n* is default, for all objects.\n\n cf DS100 OSC documentation 2.2 OSC Address Pattern (wildcards, ranges) for more info\n",
+			"type": "String",
+			"default":"*"
+		},
+		"Get SO Levels": {
+			"description":"Update automatically Sound Objects Level meter containers values.\n",
+			"type": "Boolean",
+			"default":false
+		},
+		"Get SO Levels range": {
+			"description":"Pattern or wildcard (ex. [1-4], {1,4,42} or wildcard ? or *).\n\n* is default, for all objects.\n\n cf DS100 OSC documentation 2.2 OSC Address Pattern (wildcards, ranges) for more info\n",
 			"type": "String",
 			"default":"*"
 		},

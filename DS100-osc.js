@@ -72,12 +72,14 @@ var updateRate =null;
 var defaultCoordinateMapping =null;
 //var coordinateMappingFilter =null;
 var getSOPositionsXYZ =null;
+var getSOLevels =null;
 var getParametricSO = null;
 var getScenes = null;
 var getEnSpace = null;
 var xyz = [];
 var xy = [];
 var z = [];
+var levelMeter = [];
 
 /* 	===============================================================================
 *	Chataigne common functions
@@ -153,17 +155,27 @@ function init()
 	// collapsed as default
     SOPositionsContainer.setCollapsed(true);
 
+	// Add Sound Objects Level Meter container of values
+	SOLevelsMeterContainer = local.values.addContainer("All Sound Objects Level metering", "Sound Objects level pre-mute metering in dB");
+	for (var i=1; i<65; i++){
+		levelMeter[i]= SOLevelsMeterContainer.addFloatParameter(i, "Level", 0, -120, 0);
+		levelMeter[i].setAttribute("readonly", true);
+	}
+	// collapsed as default
+	SOLevelsMeterContainer.setCollapsed(true);
+
 	// Setup default reception update rate as in module GUI
 	updateRate = local.parameters.updateRate.get();
 	script.setUpdateRate(updateRate);
 	getParametricSO=local.parameters.getParametricSO.get();
 	getSOPositionsXYZ=local.parameters.getSOPositionsXYZ.get();
+	getSOLevels=local.parameters.getSOLevels.get();
 	getScenes=local.parameters.getScenes.get();
 	getEnSpace=local.parameters.getEnSpace.get();
 	defaultCoordinateMapping = local.parameters.defaultCoordinateMapping.get();
 	coordinateMappingFilter = defaultCoordinateMapping; // SO Positions store only objects received with this Coordinate Mapping. From now, same as Default
 	
-	// GUI setup
+	// GUI setup for other values and parameters containers
 	setReadonly();
 	collapseContainers();
 }
@@ -177,6 +189,7 @@ function update(updateRate)
 {
 	if(getParametricSO) updateSoundObject(parametricSOContainer.index.get());
 	if(getSOPositionsXYZ) updateSOPositions(local.parameters.getSOPositionsRange.get());
+	if(getSOLevels) updateSOLevels(local.parameters.getSOLevelsRange.get());
 	if(getScenes) updateScenes();
 	if(getEnSpace) updateEnSpace();
 }
@@ -202,6 +215,11 @@ function moduleParameterChanged(param)
 		getSOPositionsXYZ = local.parameters.getSOPositionsXYZ.get(); 
 		local.values.soundObjectsPositions.setCollapsed(!getSOPositionsXYZ);
 	}
+	if(param.is(local.parameters.getSOLevels))
+		{
+			getSOLevels = local.parameters.getSOLevels.get(); 
+			local.values.allSoundObjectsLevelMetering.setCollapsed(!getSOLevels);
+		}
 	if(param.is(local.parameters.getScenes))
 	{
 		getScenes = local.parameters.getScenes.get();
@@ -303,17 +321,23 @@ function oscEvent(address, args)
 			script.log("mode: "+args[0]);
 			parametricSOContainer.mode.set(args[0]);
 		}
-		else if (local.match(address, OSCChannelName+soundObjectID)) // this is the channel name string
+		else if (local.match(address, OSCChannelName+soundObjectID)) // this is parametric SO name string
 		{
 			parametricSOContainer.channelName.set(args[0]);
 		}
-		else if (local.match(address, OSCInputMute+soundObjectID)) // this is the channel mute state
+		else if (local.match(address, OSCInputMute+soundObjectID)) // this is parametric SO mute state
 		{
 			parametricSOContainer.mute.set(args[0]);	
 		}
-		else if (local.match(address, OSCMeter+soundObjectID)) // this is the channel level metering (pre mute)
+		else if (local.match(address, OSCMeter+soundObjectID)) // this is parametric SO level metering (pre mute)
 		{
 			parametricSOContainer.meter.set(args[0]);
+			levelMeter[soundObjectID].set(args[0]); // copy it also to all level metering container
+		}
+		else if (local.match(address, OSCMeter+"/*/")) // this is another object level metering (pre mute)
+		{
+			id=parseInt(address.substring(OSCMeter.length, address.length));
+			levelMeter[id].set(args[0]);
 		}
 		else 
 		{
@@ -352,12 +376,21 @@ function updateSoundObject(id)
 }
 
 /**
- * Send OSC commands to retreive Parametric Sound Object container values
- * @param {range} String Range of SO, can be joker like * for all, or [11,17] or suite {1,2,7,8}
+ * Send OSC commands to retreive All Sound Object Positions container values
+ * @param {range} String Range of SO, can be joker like * for all, or 2[4,9] for 24-29 range, or suite {1,2,7,8}
  */
 function updateSOPositions(range)
 {
 	local.send(OSCPositionXYZ + defaultCoordinateMapping + "/" + range);
+}
+
+/**
+ * Send OSC commands to retreive All Sound Object level pre mute container values
+ * @param {range} String Range of SO, can be joker like * for all, or 2[4,9] for 24-29 range, or suite {1,2,7,8}
+ */
+function updateSOLevels(range)
+{
+	local.send(OSCMeter + range);
 }
 
 /**
