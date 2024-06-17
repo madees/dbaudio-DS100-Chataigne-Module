@@ -213,7 +213,7 @@ function moduleParameterChanged(param)
 	if(param.is(local.parameters.getSOPositionsXYZ))
 	{
 		getSOPositionsXYZ = local.parameters.getSOPositionsXYZ.get(); 
-		local.values.soundObjectsPositions.setCollapsed(!getSOPositionsXYZ);
+		local.values.allSoundObjectsPositions.setCollapsed(!getSOPositionsXYZ);
 	}
 	if(param.is(local.parameters.getSOLevels))
 		{
