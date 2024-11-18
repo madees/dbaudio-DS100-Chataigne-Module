@@ -1,13 +1,15 @@
 # dbaudio-DS100-Chataigne-Module
 Chataigne module to control d&amp;b audiotechnik DS100 matrix hardware with OSC protocol.  
 
-This community module is NOT OFFICIALLY supported by d&b audiotechnik.
-It is publicly available to enable interested users to experiment, extend and create their own adaptations.
-There is no guarantee for compatibility in between versions or for the implemented functionality to be reliable for professional.
-Use what is provided here at your own risk!
+> [!CAUTION]
+> This community module is NOT OFFICIALLY supported by d&b audiotechnik.
+> It is publicly available to enable interested users to experiment, extend and create their own adaptations.
+> There is no guarantee for compatibility in between versions or for the implemented functionality to be reliable for professional.
+> Use what is provided here at your own risk!
 
-That being said, I took great care to beta test all features with DS100 hardware before commits.
-Please use GitHub Issues and/or contact me on Discord if you see any bug, I'll try to fix it asap !
+> [!TIP]
+> That being said, I took great care to beta test all features with DS100 hardware before commits.
+> Please use GitHub Issues and/or contact me on Discord if you see any bug, I'll try to fix it asap !
 
 To learn more about Chataigne, please visit : http://benjamin.kuperberg.fr/chataigne/
 
@@ -89,9 +91,13 @@ Commands are ready to use with the "Command tester" tool, or as outputs from the
 - object is sound object (input matrix channel), integer, 1 to 64 range
 - mapping is the DS100 coordinate mapping area as specified in R1, integer. 0 will use the global module parameter, or specific area form 1 to 4.
 
-#### What's the difference between Point2D, Polar and Position XY ?
-For ease of use, there are several 2D positionning commands, with different ranges and center positions :
-![Positionning of Sound Objects](/SourcePositionDS100module.jpg)
+> [!NOTE]
+> #### What's the difference between Point2D, Polar and Position XY ?
+> For ease of use, there are several 2D positionning commands, with different ranges and center positions :
+> ![Positionning of Sound Objects](/SourcePositionDS100module.jpg)
+> - Position XY is directly the DS00 coordinate mapping, so may be easiest if you want to ease record/playback without conversion.
+> - PointD may be easier to use if you have already objects as Chataigne Point2D, like Custom variable presets or 2D mapping sequences, that use (0,0) as center position.
+> - Polar may ease reproducing an egocentric scene, or if you want to do simple centered circle trajectories.
 
 Here is the command list, if you need to know more about arguments type and ranges, please refer to the https://www.dbaudio.com/assets/products/downloads/manuals-documentation/electronics/dbaudio-osc-protocol-ds100-1.3.7-en.pdf
 
