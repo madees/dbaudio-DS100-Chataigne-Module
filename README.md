@@ -30,14 +30,14 @@ Especially, the maximum number of objects is 128. You should be aware that there
 
 ### DS100 (Dante/AES67): 
 
-- 64 x 24 @ 48 kHz or 96 kHz
-- 64 x 64 @ 48 kHz or 96 kHz
-- 128 x 64 @ 48 kHz
+- 64 x 24 @ 48 kHz or 96 kHz (Licence "S")
+- 64 x 64 @ 48 kHz or 96 kHz (Licence "L")
+- 128 x 64 @ 48 kHz (Licence "XL")
   
 ### DS100M (MADI and Milan/AVB):
-- 64 x 24 @ 48 kHz or 96 kHz
-- 64 x 64 @ 48 kHz or 96 kHz
-- 128 x 64 @ 48 kHz or 96 kHz
+- 64 x 24 @ 48 kHz or 96 kHz (Licence "S")
+- 64 x 64 @ 48 kHz or 96 kHz (Licence "L")
+- 128 x 64 @ 48 kHz or 96 kHz (Licence "XL")
   
 ## Installation
 To install the Custom Module, it's very easy inside Chataigne :
