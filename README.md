@@ -20,6 +20,20 @@ To learn more about d&amp;b audiotechnik DS100, please visit : https://www.dbsou
 For global support on how to use Chataigne and its modules, please join us on Discord : 
 https://discord.com/invite/ngnJ5z my contact there is also "madees".
 
+## Compatibility
+This latest release (2.4) has been tested with :
+- DS100 FW 3.00.02
+- Chataigne 1.9.24
+Especially, the maximum number of objects is 128. You should be aware that there can be some limitation depending on DS100 variants, licence and settings :
+DS100 (Dante/AES67):
+- 64 x 24 @ 48 kHz or 96 kHz
+- 64 x 64 @ 48 kHz or 96 kHz
+- 128 x 64 @ 48 kHz
+DS100M (MADI and Milan/AVB):
+- 64 x 24 @ 48 kHz or 96 kHz
+- 64 x 64 @ 48 kHz or 96 kHz
+- 128 x 64 @ 48 kHz or 96 kHz
+  
 ## Installation
 To install the Custom Module, it's very easy inside Chataigne :
 Go to File menu>Community Module Manager
@@ -46,7 +60,7 @@ If you don't need continuous feedback from device, you can deactivate those func
 Default values are "false" (off) so the module is "OSC output quiet" when no Commands are sent by your Noisette, those containers values will update only when you use corresponding Commands, and so the device answers back to confirm reception and parameters changes.
 
 #### - Get SO Positions / levels range
-String to choose which objects are polled. It uses standard OSC wildcards, so "*" means all channel available (64), you can specify only one number, or a range, example 1[2-8] will do for object 12 to 18, {1,24,40} will do for objects 1, 24 and 40. See dbaudio-osc-protocol-ds100-1.3.7-en.pdf page 5 for more examples.
+String to choose which objects are polled. It uses standard OSC wildcards, so "*" means all channel available (128), you can specify only one number, or a range, example 1[2-8] will do for object 12 to 18, {1,24,40} will do for objects 1, 24 and 40. See [dbaudio-osc-protocol-ds100-1.3.7-en.pdf page 5](https://www.dbsoundscape.com/assets/products/downloads/manuals-documentation/electronics/dbaudio-osc-protocol-ds100-1.3.9-en.pdf) for more examples.
 
 #### - Default Coordinate Mapping
 Used in all commands that need to specify a coordinate mapping.
@@ -71,7 +85,7 @@ Use Commands to change scene (index, previous, next).
 If "Get Scenes" module parameter is on, the values will be retrieved  from device continuously at Update Rate. If not, you'll have update only when the device sent them to you, generally by answering back when you change the scene with a Command.
 
 #### - Values>EnSpace
-This container shows actual EnSpace reverberation settings. Read only.
+This container shows actual EnSpace reverberation global settings. Read only.
 If "Get EnSpace" module parameter is on, the values will be retrieved from device continuously at Update Rate. If not, you'll have update only when the device sent them to you, generally by answering back when you change those parameters with corresponding Commands.
 
 #### - Values>Parametric Sound Object
@@ -79,16 +93,22 @@ This container receives one Sound Object (SO) parameters. Read only except Index
 Its Index correspond to the "DS100 matrix input" number, so you can choose which object you want to retreive parameters.
 If "Get SoundObjects" module parameter is on, the values will be retrieved continuously at Update Rate. If not, you'll have update only when the device sent them to you, generally by answering back when you change this SoundObject parameters with a command.
 
-#### - Values>Sound Objects Positions
-This container receives all (64) Sound Objects positions (X,Y,Z) triplets in Default Coordinate Mapping from "Get SO Positions XYZ" option.
+#### - Values>All Sound Objects Positions
+This container receives all Sound Objects positions (X,Y,Z) triplets in Default Coordinate Mapping from "Get SO Positions XYZ" option.
 Splitted in three sub containers : (X,Y,Z), (X,Y) and Z, to ease mappings, especially in Sequences>Mapping2D>Recorder for multiple objects positions, and Z to FG level for elevation effects.
+
+#### - Values>All Sound Objects Level metering
+This container receives all Sound Objects enveloppe level metering, depending on "Get SO level" options.
+
+#### - Values>All Sound Objects En-Space sends
+This container receives all Sound Objects En-SPace sends levels, depending on "Get SO En-Space sends" options.
 
 ## Commands
 Commands are ready to use with the "Command tester" tool, or as outputs from the State machine and Sequences in Time Machine, or from your own scripts. As an example, you can create a Sequence, add a Mapping 2D and use as outputs the command coordinateMappingPosition2DCartesian to generate sound objects displacements cues.
 
 #### Common arguments
 - gain is in dB, float, -120 to +24 range
-- object is sound object (input matrix channel), integer, 1 to 64 range
+- object is sound object number (input matrix channel), integer, 1 to 128 range (depends on harware variant, sampling rate or licence)
 - mapping is the DS100 coordinate mapping area as specified in R1, integer. 0 will use the global module parameter, or specific area form 1 to 4.
 
 > [!NOTE]
@@ -99,7 +119,7 @@ Commands are ready to use with the "Command tester" tool, or as outputs from the
 > - PointD may be easier to use if you have already objects as Chataigne Point2D, like Custom variable presets or 2D mapping sequences, that use (0,0) as center position.
 > - Polar may ease reproducing an egocentric scene, or if you want to do simple centered circle trajectories.
 
-Here is the command list, if you need to know more about arguments type and ranges, please refer to the https://www.dbaudio.com/assets/products/downloads/manuals-documentation/electronics/dbaudio-osc-protocol-ds100-1.3.7-en.pdf
+Here is the command list, if you need to know more about arguments type and ranges, please refer to the [dbaudio-osc-protocol-ds100-1.3.7-en.pdf page 5](https://www.dbsoundscape.com/assets/products/downloads/manuals-documentation/electronics/dbaudio-osc-protocol-ds100-1.3.9-en.pdf)
 
 - Custom Message() :
 If you need one OSC command that isn't in the module yet, (for example, matrix control), the command Custom Message is there in the module for that purpose. Just add the OSC string from documentation above and eventually Arguments. If you think this command may be usefull for other users and want to add it to the Community Module, please contact us thru Chataigne Discord or Forum : http://benjamin.kuperberg.fr/chataigne/en/#community
@@ -146,6 +166,6 @@ If you need one OSC command that isn't in the module yet, (for example, matrix c
 
 - matrixInputMute(object, boolean) : set a specific sound object mute state
 
-- FGOutputMute(object, boolean) : set a specific sound object mute state to a specific Function Group
+- FGOutputMute(object, FG, boolean) : set a specific sound object mute state to a specific Function Group number (according to AC/R1 settings)
 
-- FGOutputGain(Object, gain) : set the gain of this specific Sound Object to this specific Function Group cross point
+- FGOutputGain(object, FG, gain) : set the gain of this specific Sound Object to this specific Function Group number cross point ((according to AC/R1 settings)
