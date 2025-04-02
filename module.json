@@ -3,7 +3,7 @@
 	"type": "OSC",
 	"path": "Hardware",
 	
-	"version": "2.3.2",
+	"version": "2.4.1",
 	"description": "Module to control the d&b audiotechnik DS100 by OSC.\n\nPlease visit https://www.dbsoundscape.com/ to learn more about d&b Soundscape and DS100, especially download the TI501 'd&b Soundscape System design and operation' and DS100 OSC protocol white paper.\n\nChataigne Module specific documentation can be found in the README on GitHub:",
 	"url": "https://github.com/madees/dbaudio-DS100-Chataigne-Module",
 	"downloadURL": "https://github.com/madees/dbaudio-DS100-Chataigne-Module/archive/master.zip",
@@ -72,7 +72,17 @@
 			"default":false
 		},
 		"Get SO Levels range": {
-			"description":"Pattern or wildcard (ex. [1-4], {1,4,42} or wildcard ? or *).\n\n* is default, for all objects.\n\n cf DS100 OSC documentation 2.2 OSC Address Pattern (wildcards, ranges) for more info\n",
+			"description":"Pattern or wildcard (ex. [1-4], {1,4,42} or wildcard ? or *).\n\n* is default, for all objects.\n\n cf DS100 OSC documentation §3.2 OSC Address Pattern (wildcards, ranges) for more info\n",
+			"type": "String",
+			"default":"*"
+		},
+		"Get SO En-Space sends": {
+			"description":"Update automatically Sound Objects En-Spce sends levels containers values.\n",
+			"type": "Boolean",
+			"default":false
+		},
+		"Get SO En-Space sends range": {
+			"description":"Pattern or wildcard (ex. [1-4], {1,4,42} or wildcard ? or *).\n\n* is default, for all objects.\n\n cf DS100 OSC documentation §3.2 OSC Address Pattern (wildcards, ranges) for more info\n",
 			"type": "String",
 			"default":"*"
 		},
@@ -312,7 +322,7 @@
 				{
 					"type":"Integer",
 					"min":1,
-					"max":64
+					"max":128
 				},
 				"Spread":
 				{
@@ -333,7 +343,7 @@
 				{
 					"type":"Integer",
 					"min":1,
-					"max":64
+					"max":128
 				},
 				"Delay Mode":
 				{
@@ -360,7 +370,7 @@
 				{
 					"type":"Integer",
 					"min":1,
-					"max":64
+					"max":128
 				},
 				"X Position":
 				{
@@ -387,7 +397,7 @@
 				{
 					"type":"Integer",
 					"min":1,
-					"max":64
+					"max":128
 				},
 				"Y Position":
 				{
@@ -414,7 +424,7 @@
 				{
 					"type":"Integer",
 					"min":1,
-					"max":64
+					"max":128
 				},
 				"Z Position":
 				{
@@ -441,7 +451,7 @@
 				{
 					"type":"Integer",
 					"min":1,
-					"max":64
+					"max":128
 				},
 				"Position (X,Y)":
 				{
@@ -468,7 +478,7 @@
 				{
 					"type":"Integer",
 					"min":1,
-					"max":64
+					"max":128
 				},
 				"Position (X,Y,Z)":
 				{
@@ -495,7 +505,7 @@
 				{
 					"type":"Integer",
 					"min":1,
-					"max":64
+					"max":128
 				},
 				"Position (X,Y)":
 				{
@@ -522,7 +532,7 @@
 				{
 					"type":"Integer",
 					"min":1,
-					"max":64
+					"max":128
 				},
 				"Azimuth":
 				{
@@ -549,7 +559,7 @@
 				{
 					"type":"Integer",
 					"min":1,
-					"max":64
+					"max":128
 				},
 				"Send gain dB":
 				{
@@ -570,7 +580,7 @@
 				{
 					"type":"Integer",
 					"min":1,
-					"max":64
+					"max":128
 				},
 				"Gain dB":
 				{
@@ -590,7 +600,7 @@
 				{
 					"type":"Integer",
 					"min":1,
-					"max":64
+					"max":128
 				},
 				"Mute":
 				{
@@ -608,13 +618,13 @@
 				{
 					"type":"Integer",
 					"min":1,
-					"max":64
+					"max":128
 				},
 				"Function Group #":
 				{
 					"type":"Integer",
 					"min":1,
-					"max":16
+					"max":32
 				},
 				"Mute":
 				{
@@ -632,13 +642,13 @@
 				{
 					"type":"Integer",
 					"min":1,
-					"max":64
+					"max":128
 				},
 				"Function Group #":
 				{
 					"type":"Integer",
 					"min":1,
-					"max":16
+					"max":32
 				},
 				"Gain dB":
 				{

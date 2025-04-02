@@ -1,4 +1,4 @@
-/* Chataigne Module for d&b audiotechnik DS100 OSC v2.2 (c) Mathieu Delquignies, 05/2024
+/* Chataigne Module for d&b audiotechnik DS100 OSC v2.4 (c) Mathieu Delquignies, 04/2025
 ===============================================================================
 This file is a Chataigne Custom Module to remote control d&b audiotechnik DS100.
 
@@ -28,7 +28,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /** 
  * Constants
  * 
- * Table of OSC strings from https://www.dbaudio.com/assets/products/downloads/manuals-documentation/electronics/dbaudio-osc-protocol-ds100-1.3.7-en.PDF
+ * Table of OSC strings from https://www.dbsoundscape.com/assets/products/downloads/manuals-documentation/electronics/dbaudio-osc-protocol-ds100-1.3.9-en.pdf 
  * Juce Javascript don't allow const so they are defined as global variable instead, see https://docs.juce.com/master/index.html
  */
 var OSCDeviceName = "/dbaudio1/settings/devicename";
@@ -73,6 +73,7 @@ var defaultCoordinateMapping =null;
 //var coordinateMappingFilter =null;
 var getSOPositionsXYZ =null;
 var getSOLevels =null;
+var getSOSends =null;
 var getParametricSO = null;
 var getScenes = null;
 var getEnSpace = null;
@@ -80,6 +81,7 @@ var xyz = [];
 var xy = [];
 var z = [];
 var levelMeter = [];
+var sendsLevels = [];
 
 /* 	===============================================================================
 *	Chataigne common functions
@@ -111,7 +113,7 @@ function init()
 
 	// Add Parametric Sound Object container of values
 	parametricSOContainer = local.values.addContainer("Parametric Sound Object", "Parameters of one Sound Object specified by Index");
-	parametricSOContainer.addIntParameter("Index", "object ID, DS100 Matrix inputs, from 1 to 64", 1, 1, 64);
+	parametricSOContainer.addIntParameter("Index", "object ID, DS100 Matrix inputs, from 1 to 128", 1, 1, 128);
 	// this value is an GUI editable parameter
 	var channelName = parametricSOContainer.addStringParameter("Channel Name", "Matrix input name", "Object name");
 	channelName.setAttribute("readonly", true);
@@ -138,13 +140,13 @@ function init()
 	parametricSOContainer.setCollapsed(true);
 
 	// Add Sound Objects Positions XYZ, XY and Z container of values
-	SOPositionsContainer = local.values.addContainer("All Sound Objects Positions", "X, Y and Z values for each of the 64 objects");
-	SOXYZContainer = SOPositionsContainer.addContainer("XYZ", "X, Y and Z values for each of the 64 objects");
-	SOXYContainer = SOPositionsContainer.addContainer("XY", "X and Y values for each of the 64 objects");
-	SOZContainer = SOPositionsContainer.addContainer("Z", "Z values for each of the 64 objects");
+	SOPositionsContainer = local.values.addContainer("All Sound Objects Positions", "X, Y and Z values for each of the 128 objects");
+	SOXYZContainer = SOPositionsContainer.addContainer("XYZ", "X, Y and Z values for each of the 128 objects");
+	SOXYContainer = SOPositionsContainer.addContainer("XY", "X and Y values for each of the 128 objects");
+	SOZContainer = SOPositionsContainer.addContainer("Z", "Z values for each of the 128 objects");
 
 	// Add XYZ values into those containers
-	for (var i = 1; i < 65; i++) {
+	for (var i = 1; i <= 128; i++) {
     	xyz[i]= SOXYZContainer.addPoint3DParameter(i, "XYZ");
 		xyz[i].setAttribute("readonly", true);
 		xy[i]= SOXYContainer.addPoint2DParameter(i, "XY");
@@ -157,12 +159,21 @@ function init()
 
 	// Add Sound Objects Level Meter container of values
 	SOLevelsMeterContainer = local.values.addContainer("All Sound Objects Level metering", "Sound Objects level pre-mute metering in dB");
-	for (var i=1; i<65; i++){
+	for (var i=1; i<= 128; i++){
 		levelMeter[i]= SOLevelsMeterContainer.addFloatParameter(i, "Level", 0, -120, 0);
 		levelMeter[i].setAttribute("readonly", true);
 	}
 	// collapsed as default
 	SOLevelsMeterContainer.setCollapsed(true);
+
+	// Add Sound Objects En-Space sends levels container of values
+	SOSendsLevelsContainer = local.values.addContainer("All Sound Objects En-Space sends levels", "Sound Objects sends to En-Space levels in dB");
+	for (var i=1; i<= 128; i++){
+		sendsLevels[i]= SOSendsLevelsContainer.addFloatParameter(i, "Level", 0, -120, 24);
+		sendsLevels[i].setAttribute("readonly", true);
+	}
+	// collapsed as default
+	SOSendsLevelsContainer.setCollapsed(true);
 
 	// Setup default reception update rate as in module GUI
 	updateRate = local.parameters.updateRate.get();
@@ -170,6 +181,7 @@ function init()
 	getParametricSO=local.parameters.getParametricSO.get();
 	getSOPositionsXYZ=local.parameters.getSOPositionsXYZ.get();
 	getSOLevels=local.parameters.getSOLevels.get();
+	getSOSends=local.parameters.getSOEn_SpaceSends.get();
 	getScenes=local.parameters.getScenes.get();
 	getEnSpace=local.parameters.getEnSpace.get();
 	defaultCoordinateMapping = local.parameters.defaultCoordinateMapping.get();
@@ -190,6 +202,7 @@ function update(updateRate)
 	if(getParametricSO) updateSoundObject(parametricSOContainer.index.get());
 	if(getSOPositionsXYZ) updateSOPositions(local.parameters.getSOPositionsRange.get());
 	if(getSOLevels) updateSOLevels(local.parameters.getSOLevelsRange.get());
+	if(getSOSends) updateSOSends(local.parameters.getSOEn_SpaceSendsRange.get());
 	if(getScenes) updateScenes();
 	if(getEnSpace) updateEnSpace();
 }
@@ -219,6 +232,11 @@ function moduleParameterChanged(param)
 		{
 			getSOLevels = local.parameters.getSOLevels.get(); 
 			local.values.allSoundObjectsLevelMetering.setCollapsed(!getSOLevels);
+		}
+	if(param.is(local.parameters.getSOEn_SpaceSends))
+		{
+			getSOSends = local.parameters.getSOEn_SpaceSends.get(); 
+			local.values.allSoundObjectsEn_SpaceSendsLevels.setCollapsed(!getSOSends);
 		}
 	if(param.is(local.parameters.getScenes))
 	{
@@ -339,6 +357,11 @@ function oscEvent(address, args)
 			id=parseInt(address.substring(OSCMeter.length, address.length));
 			levelMeter[id].set(args[0]);
 		}
+		else if (local.match(address, OSCRevGain+"/*/")) // this is another object En-Space send level
+		{
+			id=parseInt(address.substring(OSCRevGain.length, address.length));
+			levelMeter[id].set(args[0]);
+		}
 		else 
 		{
 		script.logWarning("OSC Event parser received useless OSC messages: " + address + " " + args);
@@ -355,7 +378,7 @@ function oscEvent(address, args)
 
 /**
  * Send OSC commands to retreive Parametric Sound Object container values
- * @param {id} Integer Sound Object Index (1-64)
+ * @param {id} Integer Sound Object Index (1-128)
  */
 function updateSoundObject(id)
 {
@@ -391,6 +414,15 @@ function updateSOPositions(range)
 function updateSOLevels(range)
 {
 	local.send(OSCMeter + range);
+}
+
+/**
+ * Send OSC commands to retreive All Sound Object En-Space sends levels container values
+ * @param {range} String Range of SO, can be joker like * for all, or 2[4,9] for 24-29 range, or suite {1,2,7,8}
+ */
+function updateSOSends(range)
+{
+	local.send(OSCRevGain + range);
 }
 
 /**
@@ -433,7 +465,7 @@ function updateEnSpace()
  */
 function deviceClear()
 {
-	if (util.showOkCancelBox("It will clear all device settings !", "Are you sure ?", "warning", "Yes, clear all values","Naaah"))
+	if (util.showOkCancelBox("DeviceClear","It will clear all device settings !", "(excluding IP)\n Are you sure ?", "warning", "Yes, clear all values","Naaah"))
 	{
 		local.send(OSCDeviceClear);
 	}
@@ -650,7 +682,7 @@ function matrixInputMute(object, state)
 /**
  * Set a specific sound object level within a specific FG
  * @param {integer} object 
- * @param {integer} FG (Function Group, from 1 to 16)
+ * @param {integer} FG (Function Group, from 1 to 32)
  * @param {float} gain (from -120 to +24 in dB)
  */
  function FGOutputGain(object, FG, gain)
@@ -661,7 +693,7 @@ function matrixInputMute(object, state)
  /**
   * Set a specific sound object matrix input mute state
   * @param {integer} object
-  *  * @param {integer} FG (Function Group, from 1 to 16)
+  *  * @param {integer} FG (Function Group, from 1 to 32)
   * @param {boolean} state 
   */
  function FGOutputMute(object, FG, state)
@@ -857,7 +889,7 @@ function soloSO(ID,state) {
 		/* first prototype without mute states memory
 		* !!! without this code finished, all matrix mute state will be lost and overwritten !!!
 		//First, collect all mute states in inputMuteStates array
-		for (var i = 1; i <= 64; i++) 
+		for (var i = 1; i <= 128; i++) 
 		{
 			local.send(OSCInputMute + i);
 		}
@@ -873,7 +905,7 @@ function soloSO(ID,state) {
 	{
 		/* first prototype without mute states memory
 		//Recover pre-solo mute states
-		for (var i = 1; i <= 64; i++)
+		for (var i = 1; i <= 128; i++)
 		{
 			local.send(OSCInputMute + ID, inputMuteStates[i]);
 		}
