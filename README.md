@@ -27,13 +27,14 @@ This latest release (2.4) has been tested with :
 - Chataigne 1.9.24
  
 Especially, the maximum number of objects is 128. You should be aware that there can be some limitation depending on DS100 variants, licence and settings :
-DS100 (Dante/AES67): 
+
+### DS100 (Dante/AES67): 
 
 - 64 x 24 @ 48 kHz or 96 kHz
 - 64 x 64 @ 48 kHz or 96 kHz
 - 128 x 64 @ 48 kHz
   
-DS100M (MADI and Milan/AVB):
+### DS100M (MADI and Milan/AVB):
 - 64 x 24 @ 48 kHz or 96 kHz
 - 64 x 64 @ 48 kHz or 96 kHz
 - 128 x 64 @ 48 kHz or 96 kHz
