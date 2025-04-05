@@ -1,5 +1,5 @@
 # dbaudio-DS100-Chataigne-Module
-Chataigne module to control d&amp;b audiotechnik DS100 audio matrix hardware with OSC protocol.  
+Chataigne module to control d&amp;b audiotechnik DS100 real time audio matrix hardware with OSC protocol.  
 
 > [!CAUTION]
 > This community module is NOT OFFICIALLY supported by d&b audiotechnik.
