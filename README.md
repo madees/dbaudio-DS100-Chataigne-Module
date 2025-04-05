@@ -26,7 +26,7 @@ This latest release (2.4) has been tested with :
 - DS100 FW 3.00.02
 - Chataigne 1.9.24
  
-Especially, the maximum number of objects is 128. You should be aware that there can be some limitation depending on DS100 variants, licence and settings :
+Especially, the maximum number of sound objects is now 128, and maximum rendering Function Groups is 32. You should be aware that there can be some limitation on inouts and outputs depending on DS100 variants, licence and settings :
 
 ### DS100 (Dante/AES67): 
 
