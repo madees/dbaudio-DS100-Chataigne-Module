@@ -106,10 +106,10 @@ Splitted in three sub containers : (X,Y,Z), (X,Y) and Z, to ease mappings, espec
 This container receives all Sound Objects enveloppe level metering, depending on "Get SO level" options.
 
 #### - Values>All Sound Objects En-Space sends
-This container receives all Sound Objects En-SPace sends levels, depending on "Get SO En-Space sends" options.
+This container receives all Sound Objects En-Space sends levels, depending on "Get SO En-Space sends" options.
 
 ## Commands
-Commands are ready to use with the "Command tester" tool, or as outputs from the State machine and Sequences in Time Machine, or from your own scripts. As an example, you can create a Sequence, add a Mapping 2D and use as outputs the command coordinateMappingPosition2DCartesian to generate sound objects displacements cues.
+Commands are ready to use with the "Command tester" tool, Templates or as outputs from the State machine and Sequences in Time Machine, or from your own scripts. As an example, you can create a Sequence, add a Mapping 2D and use as outputs the command coordinateMappingPosition2DCartesian to generate sound objects displacements cues.
 
 #### Common arguments
 - gain is in dB, float, -120 to +24 range
