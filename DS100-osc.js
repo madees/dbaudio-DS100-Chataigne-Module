@@ -1,4 +1,4 @@
-/* Chataigne Module for d&b audiotechnik DS100 OSC v2.4 (c) Mathieu Delquignies, 04/2025
+/* Chataigne Module for d&b audiotechnik DS100 OSC v2.5.0 (c) Mathieu Delquignies, 08/2026
 ===============================================================================
 This file is a Chataigne Custom Module to remote control d&b audiotechnik DS100.
 
@@ -63,6 +63,9 @@ var OSCFGOutputGain = "/dbaudio1/soundobjectrouting/gain/";
 var OSCFGOutputMute = "/dbaudio1/soundobjectrouting/mute/";
 var OSCSRStatus = "/dbaudio1/status/audionetworksamplestatus";
 var OSCMeter ="/dbaudio1/matrixinput/levelmeterpremute/";
+var OSCFirmwareVersion = "/dbaudio1/fixed/firmwareversion";
+var OSCMatrixInputCount = "/dbaudio1/status/matrixinputcount";
+var OSCMatrixOutputCount = "/dbaudio1/status/matrixoutputcount";
 
 /** 
  * Global variables
@@ -70,7 +73,7 @@ var OSCMeter ="/dbaudio1/matrixinput/levelmeterpremute/";
 var parametricSOContainer =null;
 var updateRate =null;
 var defaultCoordinateMapping =null;
-//var coordinateMappingFilter =null;
+var coordinateMappingFilter =null;
 var getSOPositionsXYZ =null;
 var getSOLevels =null;
 var getSOSends =null;
@@ -82,6 +85,15 @@ var xy = [];
 var z = [];
 var levelMeter = [];
 var sendsLevels = [];
+var pingPongTime = null;
+var pingPongTimer = null;
+var holdOffTime = 1; // should be in ms but in seconds !! // ms, to avoid loop of OSC commands when changing a value in GUI and sending it to DS100, which will send it back to GUI
+var holdOffPSOPositionTimer = null;
+var holdOffPSORevGainTimer = null;
+var holdOffPSOInputGainTimer = null;
+var holdOffPSOSpreadTimer = null;
+var holdOffPSODelayModeTimer = null;
+var holdOffPSOMuteTimer = null;
 
 /* 	===============================================================================
 *	Chataigne common functions
@@ -100,6 +112,9 @@ function init()
 	// See https://bkuperberg.gitbook.io/chataigne-docs/scripting/scripting-reference/module-scripts#module-specific-methods-the-local-object
 	local.register(OSCDeviceName, "rxDeviceName");
 	local.register(OSCDeviceSerial, "rxSerialNumber");
+	local.register(OSCFirmwareVersion, "rxFirmwareVersion");
+	local.register(OSCMatrixInputCount, "rxMatrixInputCount");
+	local.register(OSCMatrixOutputCount, "rxMatrixOutputCount");
 	local.register(OSCPong, "rxPong");
 	local.register(OSCGnrlErr, "rxError");
 	local.register(OSCErrorText, "rxErrorText");
@@ -114,29 +129,25 @@ function init()
 	// Add Parametric Sound Object container of values
 	parametricSOContainer = local.values.addContainer("Parametric Sound Object", "Parameters of one Sound Object specified by Index");
 	parametricSOContainer.addIntParameter("Index", "object ID, DS100 Matrix inputs, from 1 to 128", 1, 1, 128);
-	// this value is an GUI editable parameter
 	var channelName = parametricSOContainer.addStringParameter("Channel Name", "Matrix input name", "Object name");
 	channelName.setAttribute("readonly", true);
-	var coordinateMapping = parametricSOContainer.addIntParameter("Coordinate Mapping", "DS100 coordinate mapping filter for Rx positions", 0, 0, 4);
-	var position2D = parametricSOContainer.addPoint2DParameter("Position 2D", "(x,y) position in coordinate mapping");
-	position2D.setAttribute("readonly", true);
-	var positionZ = parametricSOContainer.addFloatParameter("Position Z", "(z) vertical position in coordinate mapping", 0, 0, 1);
-	positionZ.setAttribute("readonly", true);
-	var spread = parametricSOContainer.addFloatParameter("Spread", "object spread", 0, 0, 1);
-	spread.setAttribute("readonly", true);
-	var reverb = parametricSOContainer.addFloatParameter("Reverb", "EnSpace send level", 0, -120, 24);
-	reverb.setAttribute("readonly", true);
 	var meter = parametricSOContainer.addFloatParameter("Meter", "Level meter pre mute", 0, -120, 0);
-	reverb.setAttribute("readonly", true);
+	meter.setAttribute("readonly", true);
+	var level = parametricSOContainer.addFloatParameter("Level", "Matrix input level", 0, -120, 24);
+	var mute = parametricSOContainer.addBoolParameter("Mute", "Matrix input mute", false);
+
+	var coordinateMapping = parametricSOContainer.addIntParameter("Coordinate Mapping", "DS100 coordinate mapping filter for Rx positions", 0, 0, 4);
+	
+	var positionX = parametricSOContainer.addFloatParameter("Position X", "(x) horizontal position in coordinate mapping", 0, 0, 1);
+	var positionY = parametricSOContainer.addFloatParameter("Position Y", "(y) horizontal position in coordinate mapping", 0, 0, 1);
+	var positionZ = parametricSOContainer.addFloatParameter("Position Z", "(z) vertical position in coordinate mapping", 0, 0, 1);
+	var spread = parametricSOContainer.addFloatParameter("Spread", "object spread", 0, 0, 1);
+	var reverb = parametricSOContainer.addFloatParameter("Reverb", "EnSpace send level", 0, -120, 24);
 	// option to see this as integer:
 	var mode = parametricSOContainer.addIntParameter("Mode", "Delay mode", 0, 0, 2); 
 	// option to see this as enum: (issue : less straight forward to use this string value to change and send it to DS100 instead of integer)
 	//var mode = parametricSOContainer.addEnumParameter("Delay Mode", "Delay mode", "0: Off", 0, "1: Tight", 1, "2: Full", 2);
-	mode.setAttribute("readonly", true);
-	var level = parametricSOContainer.addFloatParameter("Level", "Matrix input level", 0, -120, 24);
-	level.setAttribute("readonly", true);
-	var mute = parametricSOContainer.addBoolParameter("Mute", "Matrix input mute", false);
-	mute.setAttribute("readonly", true);
+
 	parametricSOContainer.setCollapsed(true);
 
 	// Add Sound Objects Positions XYZ, XY and Z container of values
@@ -175,7 +186,7 @@ function init()
 	// collapsed as default
 	SOSendsLevelsContainer.setCollapsed(true);
 
-	// Setup default reception update rate as in module GUI
+	// Sync variables with GUI parameters
 	updateRate = local.parameters.updateRate.get();
 	script.setUpdateRate(updateRate);
 	getParametricSO=local.parameters.getParametricSO.get();
@@ -252,7 +263,6 @@ function moduleParameterChanged(param)
 	{
 		defaultCoordinateMapping=local.parameters.defaultCoordinateMapping.get();
 	}
-	// Will add there in the future a parameter for number of sound objects containers, start in this version to try out only one "0" sound object
 }
 
 /**
@@ -268,23 +278,70 @@ function moduleValueChanged(value)
 		if (value.name=="index")
 		{
 			// input channel ID has changed, so we need to update all the soundObject container values
-			state=getSoundObjects;
-			getSoundObjects=true;
-			updateSoundObject(id);
-			getSoundObjects=state;
-
 			local.send(OSCChannelName + id); // Retreive channel name string. 
-			// (From now, to speed up updateSoundObject and lower coms, this is done just once here, not in autoUpdate)
+			// (From now, to speed up feedback and lower coms, this is done just once here, not in autoUpdate. seems reasonnable as names don't change live
+			// all the other parameters will be updated with updateSoundObject(id) below, which will send all the other OSC commands to retreive values from DS100):
+			updateSoundObject(id);
+		}
+		if (value.name=="positionX")
+		{
+			local.send(OSCPositionX + coordinateMappingFilter + "/" + id, value.get());
+			holdOffPSOPositionTimer=util.getTime();
+		}
+		if (value.name=="positionY")
+		{
+			local.send(OSCPositionY + coordinateMappingFilter + "/" + id, value.get());
+			holdOffPSOPositionTimer=util.getTime();
+		}
+		if (value.name=="positionZ")
+		{
+			local.send(OSCPositionZ + coordinateMappingFilter + "/" + id, value.get());
+			holdOffPSOPositionTimer=util.getTime();
+		}
+		if (value.name=="spread")
+		{
+			local.send(OSCSpread + id, value.get());
+			holdOffPSOSpreadTimer=util.getTime();
+		}
+		if (value.name=="reverb")
+		{
+			local.send(OSCRevGain + id, value.get());
+			holdOffPSORevGainTimer=util.getTime();
+		}
+		if (value.name=="level")
+		{
+			local.send(OSCInputGain + id, value.get());
+			holdOffPSOInputGainTimer=util.getTime();
+		}
+		if (value.name=="mode")
+		{
+			local.send(OSCDelayMode + id, value.get());
+			holdOffPSODelayModeTimer=util.getTime();
+		}
+		if (value.name=="mute")
+		{
+			local.send(OSCInputMute + id, value.get());
+			holdOffPSOMuteTimer=util.getTime();
+		}
+		if (value.name=="coordinateMapping")
+		{
+			coordinateMappingFilter=value.get();
+			if (coordinateMappingFilter==0)
+				coordinateMappingFilter=defaultCoordinateMapping;
 		}
 		
-	} else // if not, it may be a container trigger button
+	} else // if not, it is a trigger
 	{
 		if (value.name=="clickToUpdateAll")
 		{
 			// Send OSC message to retrieve Status container parameters from device
 			local.send(OSCDeviceName);
 			local.send(OSCDeviceSerial);
+			local.send(OSCFirmwareVersion);
+			local.send(OSCMatrixInputCount);
+			local.send(OSCMatrixOutputCount);
 			local.values.ds100DeviceStatus.isThereAnybodyOutThere.set(false);
+			pingPongTimer= util.getTime();
 			local.send(OSCPing);
 			local.send(OSCGnrlErr);
 			local.send(OSCErrorText);
@@ -302,70 +359,87 @@ function moduleValueChanged(value)
 function oscEvent(address, args)
 {
 	var soundObjectID = parametricSOContainer.index.get();
-	var coordinateMappingFilter = parametricSOContainer.coordinateMapping.get();
 	if (coordinateMappingFilter==0) 
 	{
 		coordinateMappingFilter=defaultCoordinateMapping;
 	}
-		if (local.match(address, OSCPositionXY+coordinateMappingFilter+"/"+soundObjectID)) // This is the Parametric Sound Object position XY values
+	// OSC Rx Parser
+	if (local.match(address, OSCPositionX+coordinateMappingFilter+"/"+soundObjectID)) // This is the Parametric Sound Object position X values
+	{
+		script.log("Rx pos X at "+util.getTime());
+		script.log("holdOffPSOPositionTimer: "+holdOffPSOPositionTimer);
+		if (holdOffPSOPositionTimer==null || util.getTime()-holdOffPSOPositionTimer>holdOffTime)
 		{
-			parametricSOContainer.position2D.set(args[0], args[1]);
+			parametricSOContainer.positionX.set(args[0]);
+			script.log("Rx pos X set");
 		}
-		else if (local.match(address, OSCPositionZ+coordinateMappingFilter+"/"+soundObjectID+"/")) // This is Parametric SO position Z
-		{
-			parametricSOContainer.positionZ.set(args[0]);
-		}
-		else if (local.match(address, OSCPositionXYZ+coordinateMappingFilter+"/*/")) // This is another Sound Object position XYZ values (same mapping as Parametric SO)
-		{
-			id=parseInt(address.substring(OSCPositionXYZ.length+2, address.length));
-			xyz[id].set(args[0], args[1], args[2]);
-			xy[id].set(args[0], args[1]);
-			z[id].set(args[2]);
-		}
-		else if (local.match(address, OSCInputGain+soundObjectID)) // this is a sound object (matrix input) level
-		{
-			parametricSOContainer.level.set(args[0]);
-		}
-		else if (local.match(address, OSCSpread+soundObjectID)) // this is a sound object spread value
-		{
-			parametricSOContainer.spread.set(args[0]);
-		}
-		else if (local.match(address, OSCRevGain+soundObjectID)) // this is a sound object reverb send gain value
-		{
-			parametricSOContainer.reverb.set(args[0]);
-		}
-		else if (local.match(address, OSCDelayMode+soundObjectID)) // this is a sound object delay mode value (Enum type, key is the "delay mode" descriptor string)
-		{
-			script.log("mode: "+args[0]);
-			parametricSOContainer.mode.set(args[0]);
-		}
-		else if (local.match(address, OSCChannelName+soundObjectID)) // this is parametric SO name string
-		{
-			parametricSOContainer.channelName.set(args[0]);
-		}
-		else if (local.match(address, OSCInputMute+soundObjectID)) // this is parametric SO mute state
-		{
-			parametricSOContainer.mute.set(args[0]);	
-		}
-		else if (local.match(address, OSCMeter+soundObjectID)) // this is parametric SO level metering (pre mute)
-		{
-			parametricSOContainer.meter.set(args[0]);
-			levelMeter[soundObjectID].set(args[0]); // copy it also to all level metering container
-		}
-		else if (local.match(address, OSCMeter+"/*/")) // this is another object level metering (pre mute)
-		{
-			id=parseInt(address.substring(OSCMeter.length, address.length));
-			levelMeter[id].set(args[0]);
-		}
-		else if (local.match(address, OSCRevGain+"/*/")) // this is another object En-Space send level
-		{
-			id=parseInt(address.substring(OSCRevGain.length, address.length));
-			levelMeter[id].set(args[0]);
-		}
-		else 
-		{
+		
+	}
+	else if (local.match(address, OSCPositionY+coordinateMappingFilter+"/"+soundObjectID+"/")) // This is Parametric SO position Y
+	{
+		if (holdOffPSOPositionTimer==null || util.getTime()-holdOffPSOPositionTimer>holdOffTime)
+		parametricSOContainer.positionY.set(args[0]);
+	}
+	else if (local.match(address, OSCPositionZ+coordinateMappingFilter+"/"+soundObjectID+"/")) // This is Parametric SO position Z
+	{
+		if (holdOffPSOPositionTimer==null || util.getTime()-holdOffPSOPositionTimer>holdOffTime)
+		parametricSOContainer.positionZ.set(args[0]);
+	}
+	else if (local.match(address, OSCPositionXYZ+coordinateMappingFilter+"/*/")) // This is another Sound Object position XYZ values (same mapping as Parametric SO)
+	{
+		id=parseInt(address.substring(OSCPositionXYZ.length+2, address.length));
+		xyz[id].set(args[0], args[1], args[2]);
+		xy[id].set(args[0], args[1]);
+		z[id].set(args[2]);
+	}
+	else if (local.match(address, OSCInputGain+soundObjectID)) // this is a sound object (matrix input) level
+	{
+		if (holdOffPSOInputGainTimer==null || util.getTime()-holdOffPSOInputGainTimer>holdOffTime)
+		parametricSOContainer.level.set(args[0]);
+	}
+	else if (local.match(address, OSCSpread+soundObjectID)) // this is a sound object spread value
+	{
+		if (holdOffPSOSpreadTimer==null || util.getTime()-holdOffPSOSpreadTimer>holdOffTime)
+		parametricSOContainer.spread.set(args[0]);
+	}
+	else if (local.match(address, OSCRevGain+soundObjectID)) // this is a sound object reverb send gain value
+	{
+		if (holdOffPSORevGainTimer==null || util.getTime()-holdOffPSORevGainTimer>holdOffTime)
+		parametricSOContainer.reverb.set(args[0]);
+	}
+	else if (local.match(address, OSCDelayMode+soundObjectID)) // this is a sound object delay mode value
+	{
+		if (holdOffPSODelayModeTimer==null || util.getTime()-holdOffPSODelayModeTimer>holdOffTime)
+		parametricSOContainer.mode.set(args[0]);
+	}
+	else if (local.match(address, OSCChannelName+soundObjectID)) // this is parametric SO name string
+	{
+		parametricSOContainer.channelName.set(args[0]);
+	}
+	else if (local.match(address, OSCInputMute+soundObjectID)) // this is parametric SO mute state
+	{
+		if (holdOffPSOMuteTimer==null || util.getTime()-holdOffPSOMuteTimer>holdOffTime)
+		parametricSOContainer.mute.set(args[0]);	
+	}
+	else if (local.match(address, OSCMeter+soundObjectID)) // this is parametric SO level metering (pre mute)
+	{
+		parametricSOContainer.meter.set(args[0]);
+		levelMeter[soundObjectID].set(args[0]); // copy it also to all level metering container
+	}
+	else if (local.match(address, OSCMeter+"/*/")) // this is another object level metering (pre mute)
+	{
+		id=parseInt(address.substring(OSCMeter.length, address.length));
+		levelMeter[id].set(args[0]);
+	}
+	else if (local.match(address, OSCRevGain+"/*/")) // this is another object En-Space send level
+	{
+		id=parseInt(address.substring(OSCRevGain.length, address.length));
+		levelMeter[id].set(args[0]);
+	}
+	else 
+	{
 		script.logWarning("OSC Event parser received useless OSC messages: " + address + " " + args);
-		}
+	}
 }
 
 /* 	===============================================================================
@@ -387,7 +461,8 @@ function updateSoundObject(id)
 		coordinateMapping=defaultCoordinateMapping;
 	}
 	{
-		local.send(OSCPositionXY + coordinateMapping + "/" + id );
+		local.send(OSCPositionX + coordinateMapping + "/" + id );
+		local.send(OSCPositionY + coordinateMapping + "/" + id );
 		local.send(OSCPositionZ + coordinateMapping + "/" + id );
 		local.send(OSCSpread + id);
 		local.send(OSCInputGain + id);
@@ -564,7 +639,7 @@ function sourceDelayMode(object, mode)
 }
 
 /**
- * Set a specific sound object X position in a specified coordinate Mapping, with DS100 cartesian XY standard limits (0,0)-(1,1)
+ * Set a specific sound object X position in a specified coordinate Mapping, with DS100 cartesian standard limits (0,0)-(1,1)
  * @param {integer} coordinateMapping 
  * @param {integer} object 
  * @param {float} X 
@@ -578,7 +653,7 @@ function coordinateMappingSourcePositionX(coordinateMapping, object, X)
 }
 
 /**
- * Set a specific sound object Y position in a specified coordinate Mapping, with DS100 cartesian XY standard limits (0,0)-(1,1)
+ * Set a specific sound object Y position in a specified coordinate Mapping, with DS100 cartesian standard limits (0,0)-(1,1)
  * @param {integer} coordinateMapping 
  * @param {integer} object 
  * @param {point2D array} Y 
@@ -589,6 +664,20 @@ function coordinateMappingSourcePositionY(coordinateMapping, object, Y)
 		coordinateMapping=defaultCoordinateMapping;
 		}
 	local.send(OSCPositionY + coordinateMapping + "/" + object, Y );
+}
+
+/**
+ * Set a specific sound object Z position in a specified coordinate Mapping, with DS100 cartesian standard limits (0,0)-(1,1)
+ * @param {integer} coordinateMapping 
+ * @param {integer} object 
+ * @param {point2D array} Z 
+ */
+function coordinateMappingSourcePositionZ(coordinateMapping, object, Z) 
+{
+	if (coordinateMapping==0) {
+		coordinateMapping=defaultCoordinateMapping;
+		}
+	local.send(OSCPositionZ + coordinateMapping + "/" + object, Z );
 }
 
 /**
@@ -730,7 +819,11 @@ function rxDeviceName(address, args)
  */
 function rxPong()
 {
+	pingPongTime=util.getTime()-pingPongTimer;
 	local.values.ds100DeviceStatus.isThereAnybodyOutThere.set(true);
+	local.values.ds100DeviceStatus.pingPongTime.set(pingPongTime*1000); // in ms
+	holdOffTime=pingPongTime*2 ; // set automatically to 2x ping pong time to avoid loop of OSC commands when changing a value in GUI and sending it to DS100, which will send it back to GUI, defualt to 100ms if no ping pong received yet
+	if (holdOffTime<0.025) holdOffTime=0.025; // minimum 25ms
 }
 
 /**
@@ -791,7 +884,7 @@ function rxSceneComment(address, args)
 function rxRoomID(address, args)
 {
 	local.values.enSpace.roomID.set(args[0]);
-	if(args[0]==0) local.values.enSpace.roomDescription.set("EnSpace off");
+	if(args[0]==0) local.values.enSpace.roomDescription.set("off");
 	else if (args[0]==1) local.values.enSpace.roomDescription.set("Modern - small");
 	else if (args[0]==2) local.values.enSpace.roomDescription.set("Classic - small");
 	else if (args[0]==3) local.values.enSpace.roomDescription.set("Modern - medium");
@@ -842,6 +935,37 @@ function rxSRStatus(addresse, args)
 	};
 	local.values.ds100DeviceStatus.samplingRate.set(status); //root.modules.dbDS100.values.ds100DeviceStatus.samplingRate
 }
+
+/**
+ * OSC Receive Matrix Input Count
+ * @param {string} address 
+ * @param {array} args 
+ */
+function rxMatrixInputCount(address, args)
+{
+	local.values.ds100DeviceStatus.matrixInputCount.set(args[0]);
+}
+
+/**
+ * OSC Receive Matrix Output Count
+ * @param {string} address
+ * @param {array} args
+ */
+function rxMatrixOutputCount(address, args)
+{
+	local.values.ds100DeviceStatus.matrixOutputCount.set(args[0]);
+}
+
+/**
+ * OSC Receive Firmware Version
+ * @param {string} address 
+ * @param {array} args
+ */
+function rxFirmwareVersion(address, args)
+{
+	local.values.ds100DeviceStatus.firmwareVersion.set(args[0]);
+}
+
 /*	===============================================================================
 	Little helper functions
 	===============================================================================
@@ -859,7 +983,11 @@ function setReadonly()
 	local.values.ds100DeviceStatus.error.setAttribute("readonly", true);
 	local.values.ds100DeviceStatus.errorText.setAttribute("readonly", true);
 	local.values.ds100DeviceStatus.samplingRate.setAttribute("readonly", true);
+	local.values.ds100DeviceStatus.firmwareVersion.setAttribute("readonly", true);
 	local.values.ds100DeviceStatus.isThereAnybodyOutThere.setAttribute("readonly", true);
+	local.values.ds100DeviceStatus.pingPongTime.setAttribute("readonly", true);
+	local.values.ds100DeviceStatus.matrixInputCount.setAttribute("readonly", true);
+	local.values.ds100DeviceStatus.matrixOutputCount.setAttribute("readonly", true);
 	local.values.scenes.sceneIndex.setAttribute("readonly", true);
 	local.values.scenes.sceneName.setAttribute("readonly", true);
 	local.values.scenes.sceneComment.setAttribute("readonly", true);
