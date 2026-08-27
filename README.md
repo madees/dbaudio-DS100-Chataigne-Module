@@ -31,7 +31,7 @@ You'll find the module in the Module Manager>Hardware>Community Modules.
 You should use Module Commands to change DS100, DS100M or DS110 parameters, and Module Values to retrieve its parameters.
 Most of the values are read only to avoid feedback loops.
 
-Sound Object is abbreviated to "SO".
+Sound Object is abbreviated to "SO". Also "DS100" means also other compatible variant devices such DS100M or DS110.
 
 ## Module interface
 
