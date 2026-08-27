@@ -28,8 +28,8 @@ You'll find the module in the Module Manager>Hardware>Community Modules.
 
 ## Principle of use
 
-You may use Module Commands to change DS100 parameters, and Module Values to retrieve its parameters.
-Values are read only.
+You should use Module Commands to change DS100, DS100M or DS110 parameters, and Module Values to retrieve its parameters.
+Most of the values are read only to avoid feedback loops.
 
 Sound Object is abbreviated to "SO".
 
@@ -91,10 +91,11 @@ If "Get EnSpace" module parameter is on, the values will be retrieved from devic
 
 This container receives one Sound Object (SO) parameters.
 Its Index correspond to the "DS100 matrix input" number, so you can choose which object you want to retreive parameters an control.
-If "Get SoundObjects" module parameter is on, the values will be retrieved continuously at Update Rate. If not, you'll have update only when the device sent them to you, generally by answering back when you change this SoundObject parameters with a command, or once when Index changes.
+If "Get SoundObjects" module parameter is on, the values will be retrieved continuously at Update Rate. 
+If not, you'll have values update only when the device sent them to you, generally by answering back a command, or automatically once when Index changes.
 There is a filter for incomings positions: only the one in specified Coordinate Mapping will be stored in x, y, z parameters.
-You can also use and modify thsoe values to send them to DS100.
-To avoid feedback infinite loop, the rx is paused by the custom module when you tx, during twice the ping-pong time.
+You can also use and modify those values to send them to DS100.
+To avoid feedback infinite loop, rx is paused by the custom module when you tx, hold-off during twice the ping-pong time.
 
 #### - Values>Sound Objects Positions
 
@@ -167,6 +168,6 @@ If you need one OSC command that isn't in the module yet, (for example, matrix c
 
 - matrixInputMute(object, boolean) : set a specific sound object mute state
 
-- FGOutputMute(object, boolean) : set a specific sound object mute state to a specific Function Group
+- FGOutputMute(object, FG, boolean) : set a specific sound object mute state to a specific Function Group
 
-- FGOutputGain(Object, gain) : set the gain of this specific Sound Object to this specific Function Group cross point
+- FGOutputGain(object, FG, gain) : set the gain of this specific Sound Object to this specific Function Group cross point
